@@ -136,7 +136,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
               Chapter 2 — Dm Pertama
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              DM pertama itu waktu kamu bilang ada host sombong banget kaerna kamu di blokir 😄.
+              DM pertama itu waktu kamu bilang ada host sombong banget karena kamu di blokir 😄.
                
             </p>
           </div>
@@ -147,7 +147,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
               Chapter 3 — Baby Duck (dutch) Pancake
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
-              Waktu itu aku pulang ke Kampung naik motor dari Jakarta,
+              Waktu itu aku pulang kampung naik motor dari Jakarta,
               padahal biasanya naik bis. Alasannya? Biar bisa mampir ketemu
               kamu dulu. Kedengarannya nekat, tapi worth it kok 😌.
             </p>
