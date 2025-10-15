@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
+interface ModalProps {
+  onClose: () => void;
+}
+
+
+
 const InteractiveBirthdayRoom = () => {
-  const [currentPage, setCurrentPage] = useState('landing');
-  const [activeModal, setActiveModal] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [lampOn, setLampOn] = useState(true);
-  const [clickedObjects, setClickedObjects] = useState([]);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [touchStartX, setTouchStartX] = useState(0);
-  const [ceilingTaps, setCeilingTaps] = useState(0);
+  const [clickedObjects, setClickedObjects] = useState<string[]>([]);
+  const [touchStartX, setTouchStartX] = useState<number>(0);
+  const [lampOn, setLampOn] = useState<boolean>(false);
+  const [ceilingTaps, setCeilingTaps] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<string>('landing');
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+
 
   const playSound = (frequency = 800, duration = 100) => {
     if (typeof window !== 'undefined' && window.AudioContext) {
@@ -26,11 +39,12 @@ const InteractiveBirthdayRoom = () => {
     }
   };
 
-  const vibrate = (pattern = 50) => {
-    if (typeof window !== 'undefined' && window.navigator.vibrate) {
-      window.navigator.vibrate(pattern);
+  const vibrate = (pattern: number | number[]): void => {
+    if (typeof window !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(pattern);
     }
   };
+
 
   const [audio] = useState(() => {
   if (typeof window !== 'undefined') {
@@ -45,7 +59,7 @@ const InteractiveBirthdayRoom = () => {
   // MODAL COMPONENTS - Warm Peach/Coral Theme
 
 // 🎂 CakeModal — pembuka & ucapan utama
-const CakeModal = ({ onClose }) => (
+const CakeModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-rose-200 via-orange-100 to-peach-100 rounded-3xl p-8 shadow-2xl">
@@ -81,7 +95,7 @@ const CakeModal = ({ onClose }) => (
 );
 
 // 📖 BookModal — Cerita Nyata Kita
-const BookModal = ({ onClose }) => (
+const BookModal: React.FC<ModalProps> = ({ onClose }) => (
   <div
     onClick={onClose}
     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
@@ -170,7 +184,7 @@ const BookModal = ({ onClose }) => (
 
 
 // 🎁 GiftModal — hadiah simbolis
-const GiftModal = ({ onClose }) => (
+const GiftModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-rose-300 via-orange-200 to-peach-200 rounded-3xl p-1 shadow-2xl">
@@ -216,7 +230,7 @@ const GiftModal = ({ onClose }) => (
 );
 
 // 🎈 BalloonModal — harapan & semangat
-const BalloonModal = ({ onClose }) => (
+const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-gradient-to-b from-rose-900 to-orange-900 bg-opacity-95 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-white rounded-3xl p-8 shadow-2xl">
@@ -248,7 +262,7 @@ const BalloonModal = ({ onClose }) => (
 );
 
 // 🪑 ChairModal — istirahat & refleksi diri
-const ChairModal = ({ onClose }) => (
+const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-orange-100 to-rose-100 rounded-3xl p-8 shadow-2xl">
@@ -279,7 +293,7 @@ const ChairModal = ({ onClose }) => (
 );
 
 // 😺 CatModal — pesan manis & lucu
-const CatModal = ({ onClose }) => (
+const CatModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-peach-100 via-orange-100 to-rose-100 rounded-3xl p-1 shadow-2xl">
@@ -315,7 +329,7 @@ const CatModal = ({ onClose }) => (
 );
 
 // 🌿 PlantModal — makna pertumbuhan & harapan
-const PlantModal = ({ onClose }) => (
+const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8 shadow-2xl">
@@ -335,7 +349,7 @@ const PlantModal = ({ onClose }) => (
 );
 
 // ☕ TableModal — simbol kebersamaan
-const TableModal = ({ onClose }) => (
+const TableModal: React.FC<ModalProps> = ({ onClose }) => (
   <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
       <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
@@ -356,7 +370,7 @@ const TableModal = ({ onClose }) => (
   </div>
 );
 
-const GalleryModal = ({ onClose }) => {
+const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const images = [
     "/foto/foto1.jpg",
@@ -429,10 +443,9 @@ const GalleryModal = ({ onClose }) => {
 
 
 
-const EasterEggModal = ({ onClose }) => {
+const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
   const [showShopeeLink, setShowShopeeLink] = useState(false);
   
-  // Link Shopee Cart (buat dulu di Shopee)
   const shopeeCartLink = "https://s.shopee.co.id/11mSjCEQF"; 
   const whatsappNumber = "6282213955753"; 
   
@@ -555,12 +568,12 @@ const EasterEggModal = ({ onClose }) => {
 
   ];
 
-  const handleHotspotClick = (action, objectId) => {
+  const handleHotspotClick = (action: string, objectId: string): void => {
     playSound(action === 'cake' ? 1200 : action === 'cat' ? 600 : 800, 150);
-    vibrate(action === 'cake' ? [50, 50, 50] : 50);
+    vibrate(action === 'cake' ? [50, 50, 50] : [50]); // <- pastikan ini array number
 
     if (!clickedObjects.includes(objectId)) {
-      setClickedObjects([...clickedObjects, objectId]);
+      setClickedObjects((prev: string[]) => [...prev, objectId]);
     }
 
     if (action === 'exit') {
@@ -583,7 +596,7 @@ const EasterEggModal = ({ onClose }) => {
     }
   };
 
-  const handleCeilingTap = () => {
+  const handleCeilingTap = (): void => {
     const newTaps = ceilingTaps + 1;
     setCeilingTaps(newTaps);
     
@@ -597,11 +610,11 @@ const EasterEggModal = ({ onClose }) => {
     setTimeout(() => setCeilingTaps(0), 2000);
   };
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>): void => {
     setTouchStartX(e.touches[0].clientX);
   };
 
-  const handleTouchEnd = (e) => {
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>): void => {
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartX - touchEndX;
     if (diff > 100) {
