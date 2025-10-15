@@ -90,6 +90,18 @@ const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-rose-200 via-orange-100 to-peach-100 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto mb-4 bg-rose-300 rounded-full flex items-center justify-center">
@@ -124,7 +136,22 @@ const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
 };
 
 // 📖 BookModal — Cerita Nyata Kita
-const BookModal: React.FC<ModalProps> = ({ onClose }) => (
+const BookModal: React.FC<ModalProps> = ({ onClose }) => {
+
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+
+    return () => {
+      const y = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      window.scrollTo(0, parseInt(y || "0") * -1);
+    };
+  }, []);
+  
+  return(
   <div
     onClick={onClose}
     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
@@ -133,6 +160,18 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-3xl overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-400 to-orange-400 p-6 text-center">
@@ -200,7 +239,10 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
         {/* Tombol Tutup */}
         <div className="p-6 pt-0">
           <button
-            onClick={onClose}
+           onClick={(e) => {
+              e.stopPropagation(); // cegah klik tembus ke backdrop
+              onClose();
+            }}
             className="w-full bg-gradient-to-r from-rose-400 to-orange-400 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
           >
             Tutup Buku 📖
@@ -210,6 +252,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
     </div>
   </div>
 );
+};
 
 
 // 🎁 GiftModal — hadiah simbolis
@@ -242,6 +285,18 @@ const GiftModal: React.FC<ModalProps> = ({ onClose }) => {
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-rose-300 via-orange-200 to-peach-200 rounded-3xl p-1 shadow-2xl">
         <div className="bg-white rounded-3xl p-6">
           <div className="text-center mb-6">
@@ -295,6 +350,19 @@ const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-white rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="flex justify-center gap-3 mb-4">
@@ -333,6 +401,19 @@ const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-orange-100 to-rose-100 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto mb-3 bg-orange-200 rounded-2xl flex items-center justify-center">
@@ -370,6 +451,18 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-peach-100 via-orange-100 to-rose-100 rounded-3xl p-1 shadow-2xl">
         <div className="bg-white rounded-3xl p-6">
           <div className="text-center mb-6">
@@ -412,6 +505,18 @@ const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white drop-shadow-lg">Teruslah Tumbuh 🌱</h2>
@@ -438,6 +543,18 @@ const TableModal: React.FC<ModalProps> = ({ onClose }) => (
       onClick={(e) => e.stopPropagation()}
       className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
       <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
         <div className="text-center mb-6">
           <span className="text-5xl block mb-3">☕</span>
@@ -476,6 +593,18 @@ const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
       onClick={(e) => e.stopPropagation()}
       className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
         <div className="text-center mb-6">
           <span className="text-4xl block mb-3">📸</span>
           <h2 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -530,116 +659,136 @@ const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
 
 
 const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
-  const [showShopeeLink, setShowShopeeLink] = useState(false);
-  
-  const shopeeCartLink = "https://s.shopee.co.id/11mSjCEQF"; 
-  const whatsappNumber = "6282213955753"; 
-  
-  const handleClaimGift = () => {
-    setShowShopeeLink(true);
-  };
-  
+  const [step, setStep] = useState<'main' | 'gift'>('main'); // State untuk ganti view
+
+  const shopeeCartLink = "https://s.shopee.co.id/11mSjCEQF";
+  const whatsappNumber = "6282213955753";
+
   const handleWhatsApp = () => {
-    const message = encodeURIComponent("Halo! Aku sudah checkout hadiah ulang tahun. Ini kode BRIVA-ku: ");
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    const message = encodeURIComponent(
+      "Halo! Aku sudah checkout hadiah ulang tahun. Ini kode BRIVA-ku: "
+    );
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
   };
 
   return (
     <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+      onClick={onClose}
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6"
     >
-        <div className="bg-white rounded-3xl p-8 shadow-2xl border-8 border-orange-300">
-          <div className="text-center mb-6">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
-              <span className="text-6xl">🎁</span>
-            </div>
-            <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600 mb-2">
-              SELAMAT
-            </h2>
-            <p className="text-lg font-bold text-gray-700">Kamu Menemukan Easter Egg</p>
-          </div>
-          
-          <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-6 mb-6 border-4 border-orange-200">
-            <p className="text-gray-800 leading-relaxed text-center mb-4">
-              Wow! Kamu perhatian banget sampai menemukan rahasia ini!
-            </p>
-            
-            <div className="bg-white rounded-xl p-5 shadow-inner mb-4">
-              <p className="text-lg font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600 mb-3">
-                Pesan Spesial Untukmu:
-              </p>
-              <p className="text-sm text-gray-700 leading-relaxed italic">
-                "Kamu itu istimewa, bukan karena hari ulang tahunmu saja, tapi karena kehadiranmu membawa kebahagiaan bagi orang-orang di sekitarmu. Jangan pernah berhenti menjadi dirimu yang luar biasa!"
-              </p>
-            </div>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-sm sm:max-w-md mx-auto bg-white rounded-3xl p-6 shadow-2xl border-4 border-orange-300 max-h-[90vh] overflow-y-auto"
+      >
+        {/* Tombol Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 bg-white/40 backdrop-blur-md text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/70 active:scale-95 transition z-10"
+        >
+          ✕
+        </button>
 
-            {/* Hadiah Tambahan Section */}
-            {!showShopeeLink ? (
-              <div className="bg-gradient-to-r from-orange-100 to-rose-100 rounded-xl p-5 border-2 border-orange-300">
-                <p className="text-center font-bold text-orange-800 mb-3">
-                  🎉 Bonus! Hadiah Spesial Untukmu 🎉
-                </p>
-                <p className="text-sm text-gray-700 text-center mb-4">
-                  Karena kamu berhasil menemukan easter egg, ada hadiah tambahan spesial dari Shopee!
-                </p>
-                <button
-                  onClick={handleClaimGift}
-                  className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
-                >
-                  Klaim Hadiah 🎁
-                </button>
+        {/* CONDITIONAL RENDERING - Ganti konten berdasarkan step */}
+        
+        {step === 'main' ? (
+          // VIEW 1: HALAMAN UTAMA
+          <>
+            <div className="text-center mb-5">
+              <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
+                <span className="text-5xl">🎁</span>
               </div>
-            ) : (
-              <div className="bg-gradient-to-r from-orange-100 to-rose-100 rounded-xl p-5 border-2 border-orange-300 space-y-4">
-                <div className="bg-white rounded-lg p-4">
-                  <p className="font-bold text-orange-800 mb-2">📦 Cara Klaim Hadiah:</p>
-                  <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
-                    <li>Klik tombol "Buka Shopee" di bawah</li>
-                    <li>Checkout barang yang sudah dipilihkan</li>
-                    <li>Pilih metode pembayaran: <strong>BRIVA</strong></li>
-                    <li>Salin kode BRIVA yang muncul</li>
-                    <li>Kirim kode BRIVA ke WhatsApp</li>
-                  </ol>
-                </div>
+              <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600 mb-1">
+                SELAMAT!
+              </h2>
+              <p className="text-sm text-gray-700 font-medium">
+                Kamu Menemukan Easter Egg 🎉
+              </p>
+            </div>
 
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
-                  <p className="text-xs text-gray-700">
-                    <strong>Catatan:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WhatsApp, nanti akan dibayarkan. Ini untuk menjaga privasi alamatmu 🔒
-                  </p>
-                </div>
+            <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 border-2 border-orange-200 text-gray-700 mb-5">
+              <p className="text-sm leading-relaxed italic">
+                "Kamu itu istimewa, bukan hanya karena hari ulang tahunmu saja,  
+                tapi karena kehadiranmu membawa kebahagiaan bagi orang-orang di sekitarmu." 💕
+              </p>
+            </div>
 
-                <button
-                  onClick={() => window.open(shopeeCartLink, '_blank')}
-                  className="w-full bg-orange-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-                >
-                  <span>🛍️</span>
-                  <span>Buka Shopee</span>
-                </button>
+            <div className="bg-gradient-to-r from-orange-100 to-rose-100 rounded-xl p-4 border-2 border-orange-300 mb-5">
+              <p className="text-center font-bold text-orange-800 mb-2">
+                🎉Bonus! Hadiah Spesial Untukmu🎉
+              </p>
+              <p className="text-sm text-gray-700 text-center">
+                Karena kamu berhasil menemukan rahasia ini, ada hadiah tambahan spesial dari Shopee!
+              </p>
+            </div>
 
-                <button
-                  onClick={handleWhatsApp}
-                  className="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-                >
-                  <span>💬</span>
-                  <span>Kirim Kode ke WhatsApp</span>
-                </button>
+            <button
+              onClick={() => setStep('gift')}
+              className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+            >
+              Klaim Hadiah 🎁
+            </button>
+          </>
+        ) : (
+          // VIEW 2: HALAMAN HADIAH
+          <>
+            {/* Tombol Back */}
+            <button
+              onClick={() => setStep('main')}
+              className="absolute top-3 left-3 bg-white/40 backdrop-blur-md text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/70 active:scale-95 transition"
+            >
+              ←
+            </button>
+
+            <div className="text-center mb-5 pt-2">
+              <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-2xl flex items-center justify-center">
+                <span className="text-4xl">🎁</span>
               </div>
-            )}
-          </div>
-          
-          <button onClick={onClose} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">
-            Tutup
-          </button>
-        </div>
+              <h3 className="text-2xl font-bold text-orange-600 mb-2">
+                Hadiah Spesial 🎁
+              </h3>
+              <p className="text-sm text-gray-700">
+                Ikuti langkah di bawah ini untuk klaim hadiahmu!
+              </p>
+            </div>
+
+            <ol className="text-sm text-left text-gray-700 list-decimal list-inside mb-4 space-y-2 bg-orange-50 p-4 rounded-xl">
+              <li>Klik tombol <strong>Buka Shopee</strong></li>
+              <li>Checkout barang pilihan</li>
+              <li>Pilih pembayaran <strong>BRIVA</strong></li>
+              <li>Salin kode BRIVA</li>
+              <li>Kirim ke WhatsApp</li>
+            </ol>
+
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded mb-4">
+              <p className="text-xs text-gray-600">
+                <strong>Catatan:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WhatsApp, nanti akan dibayarkan 🎁
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => window.open(shopeeCartLink, "_blank")}
+                className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition-transform flex items-center justify-center gap-2"
+              >
+                <span>🛍️</span>
+                <span>Buka Shopee</span>
+              </button>
+
+              <button
+                onClick={handleWhatsApp}
+                className="w-full bg-green-500 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition-transform flex items-center justify-center gap-2"
+              >
+                <span>💬</span>
+                <span>Kirim ke WhatsApp</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
+
 
   // Hotspots configuration
   const hotspots = [
