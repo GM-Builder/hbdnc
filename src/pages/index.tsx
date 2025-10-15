@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import confetti from "canvas-confetti";
+
 
 declare global {
   interface Window {
@@ -59,9 +61,35 @@ const InteractiveBirthdayRoom = () => {
   // MODAL COMPONENTS - Warm Peach/Coral Theme
 
 // 🎂 CakeModal — pembuka & ucapan utama
-const CakeModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
+
+  useEffect(() => {
+      const duration = 2 * 1000; // 2 detik
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          startVelocity: 30,
+          spread: 360,
+          origin: { x: Math.random(), y: Math.random() - 0.2 }
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }, []);
+
+  return (
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-rose-200 via-orange-100 to-peach-100 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto mb-4 bg-rose-300 rounded-full flex items-center justify-center">
@@ -93,16 +121,17 @@ const CakeModal: React.FC<ModalProps> = ({ onClose }) => (
     </div>
   </div>
 );
+};
 
 // 📖 BookModal — Cerita Nyata Kita
 const BookModal: React.FC<ModalProps> = ({ onClose }) => (
   <div
     onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      className="relative max-w-md w-full"
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
       <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-3xl overflow-hidden shadow-2xl">
         {/* Header */}
@@ -184,9 +213,35 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => (
 
 
 // 🎁 GiftModal — hadiah simbolis
-const GiftModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+const GiftModal: React.FC<ModalProps> = ({ onClose }) => {
+
+   useEffect(() => {
+      const duration = 2 * 1000; // 2 detik
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          startVelocity: 30,
+          spread: 360,
+          origin: { x: Math.random(), y: Math.random() - 0.2 }
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }, []);
+
+  return (
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-rose-300 via-orange-200 to-peach-200 rounded-3xl p-1 shadow-2xl">
         <div className="bg-white rounded-3xl p-6">
           <div className="text-center mb-6">
@@ -228,11 +283,18 @@ const GiftModal: React.FC<ModalProps> = ({ onClose }) => (
     </div>
   </div>
 );
+};
 
 // 🎈 BalloonModal — harapan & semangat
 const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-gradient-to-b from-rose-900 to-orange-900 bg-opacity-95 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-white rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="flex justify-center gap-3 mb-4">
@@ -263,8 +325,14 @@ const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
 
 // 🪑 ChairModal — istirahat & refleksi diri
 const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-orange-100 to-rose-100 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto mb-3 bg-orange-200 rounded-2xl flex items-center justify-center">
@@ -294,8 +362,14 @@ const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
 
 // 😺 CatModal — pesan manis & lucu
 const CatModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-peach-100 via-orange-100 to-rose-100 rounded-3xl p-1 shadow-2xl">
         <div className="bg-white rounded-3xl p-6">
           <div className="text-center mb-6">
@@ -330,8 +404,14 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
 
 // 🌿 PlantModal — makna pertumbuhan & harapan
 const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white drop-shadow-lg">Teruslah Tumbuh 🌱</h2>
@@ -350,8 +430,14 @@ const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
 
 // ☕ TableModal — simbol kebersamaan
 const TableModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div onClick={onClose} className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full">
+  <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
       <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
         <div className="text-center mb-6">
           <span className="text-5xl block mb-3">☕</span>
@@ -383,13 +469,13 @@ const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
 
   return (
     <div
-      onClick={onClose}
-      className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-y-auto"
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 max-w-2xl w-full shadow-2xl"
-      >
         <div className="text-center mb-6">
           <span className="text-4xl block mb-3">📸</span>
           <h2 className="text-3xl font-bold text-white drop-shadow-lg">
@@ -459,8 +545,14 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div onClick={onClose} className="fixed inset-0 bg-gradient-to-br from-orange-400 via-rose-400 to-pink-400 bg-opacity-95 flex items-center justify-center z-50 p-4">
-      <div onClick={(e) => e.stopPropagation()} className="relative max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
         <div className="bg-white rounded-3xl p-8 shadow-2xl border-8 border-orange-300">
           <div className="text-center mb-6">
             <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">

@@ -53,3 +53,42 @@ body {
 .font-hand {
   font-family: 'Patrick Hand', cursive;
 }
+
+/* 🌸 Smooth scrollbar styling for modals & mobile */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;  /* untuk Internet Explorer dan Edge */
+  scrollbar-width: none;     /* untuk Firefox */
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f9a8d4, #fdba74); /* rose-300 → orange-300 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #fb7185, #f97316); /* rose-400 → orange-500 */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 🌿 Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 🔸 Untuk iPhone & iPad: biar scroll halus tanpa bounce glitch */
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 🌸 Optional: sembunyikan scrollbar di modal jika tidak perlu */
+.modal-scroll {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(249, 168, 212, 0.6) transparent;
+}
