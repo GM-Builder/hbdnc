@@ -32,17 +32,6 @@ body {
   }
 }
 
-body {
-  max-width: 430px; 
-  margin: 0 auto;
-  background-color: #000;
-}
-
-#__next {
-  max-width: 430px;
-  margin: 0 auto;
-}
-
   @media (min-width: 768px) {
     body {
       display: flex;
