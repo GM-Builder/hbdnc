@@ -379,7 +379,7 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
             <p className="text-gray-600 text-sm mt-1">Pesan dari para kucing</p>
           </div>
           <div className="space-y-3 mb-6">
-            <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200">
+            <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200 text-black">
               🐱 <strong className='text-orange-600'>Kucing Oren:</strong> “Hidup emang nggak selalu lembut, tapi kamu tuh tangguh banget.  
                 Jangan lupa makan dan istirahat, ya.. dunia masih butuh senyummu.” 🍜💛
             </div>
@@ -387,7 +387,7 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
               😺 <strong className='text-white'>Kucing Putih:</strong> “Kamu itu baik, unik, dan pantas hidup dengan caramu sendiri.  
                 Jangan biarkan dunia kecil bikin kamu berhenti bermimpi." 💫
             </div>
-            <div className="bg-slate-50 rounded-xl p-4 border-2 border-slate-300">
+            <div className="bg-slate-50 rounded-xl p-4 border-2 border-slate- text-black">
               🐈 <strong>Kucing Hitam:</strong> “Aku tahu kamu pernah ngerasa gelap banget di dalam sana...  
                 tapi bahkan malam pun punya bintang.  
                 Dan kamu, tanpa sadar, udah jadi salah satu cahayanya.” ✨
