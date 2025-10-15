@@ -23,6 +23,7 @@ const InteractiveBirthdayRoom = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const [showSecretHotspot, setShowSecretHotspot] = useState<boolean>(false);
 
 
   const playSound = (frequency = 800, duration = 100) => {
@@ -659,131 +660,182 @@ const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
 
 
 const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
-  const [step, setStep] = useState<'main' | 'gift'>('main'); // State untuk ganti view
+  
+  const handleShowClue = () => {
+    setShowSecretHotspot(true); // Aktifkan hotspot tersembunyi
+    onClose(); // Tutup modal
+  };
 
+  return (
+     <div
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+    >
+      {/* 🧭 Tombol Close di pojok kanan atas */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          aria-label="Tutup"
+        >
+          ✕
+        </button>
+
+        {/* Header */}
+        <div className="text-center mb-5">
+          <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
+            <span className="text-5xl">🎁</span>
+          </div>
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600 mb-1">
+            SELAMAT!
+          </h2>
+          <p className="text-sm text-gray-700 font-medium">
+            Kamu Menemukan Easter Egg 🎉
+          </p>
+        </div>
+
+        {/* Pesan Spesial */}
+        <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 border-2 border-orange-200 text-gray-700 mb-5">
+          <p className="text-sm leading-relaxed italic text-center">
+            "Kamu itu istimewa, bukan hanya karena hari ulang tahunmu saja,  
+            tapi karena kehadiranmu membawa kebahagiaan bagi orang-orang di sekitarmu." 💕
+          </p>
+        </div>
+
+        {/* Petunjuk Hadiah */}
+        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-5 border-2 border-yellow-400 mb-5">
+          <div className="text-center mb-3">
+            <span className="text-4xl">🗺️</span>
+          </div>
+          <p className="text-center font-bold text-orange-800 mb-2">
+            Ada Hadiah Tersembunyi Untukmu!
+          </p>
+          <p className="text-sm text-gray-700 text-center mb-3">
+            Petunjuk: Cari di <strong>laci lemari</strong> bagian bawah... 
+            Ada sesuatu yang spesial menunggumu di sana! 👀
+          </p>
+          <div className="bg-white/70 rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-600 italic">
+              💡 Hint: Lihat di sebelah kiri bawah lemari buku!
+            </p>
+          </div>
+        </div>
+
+        {/* Tombol */}
+        <button
+          onClick={handleShowClue}
+          className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-base"
+          style={{ minHeight: '48px' }}
+        >
+          Oke, Aku Cari! 🔍
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
   const shopeeCartLink = "https://s.shopee.co.id/11mSjCEQF";
   const whatsappNumber = "6282213955753";
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      "Halo! Aku sudah checkout hadiah ulang tahun. Ini kode BRIVA-ku: "
+      "Halo! Aku sudah checkout hadiah ulang tahun dari laci rahasia. Ini kode BRIVA-ku: "
     );
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
   };
 
   return (
     <div
-      onClick={onClose}
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6"
+    onClick={onClose}
+    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="bg-gradient-to-br from-rose-400 to-purple-200 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-sm sm:max-w-md mx-auto bg-white rounded-3xl p-6 shadow-2xl border-4 border-orange-300 max-h-[90vh] overflow-y-auto"
-      >
-        {/* Tombol Close */}
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 bg-white/40 backdrop-blur-md text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/70 active:scale-95 transition z-10"
+          className="absolute top-3 right-3 bg-white/40 text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition"
         >
           ✕
         </button>
 
-        {/* CONDITIONAL RENDERING - Ganti konten berdasarkan step */}
-        
-        {step === 'main' ? (
-          // VIEW 1: HALAMAN UTAMA
-          <>
-            <div className="text-center mb-5">
-              <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
-                <span className="text-5xl">🎁</span>
-              </div>
-              <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600 mb-1">
-                SELAMAT!
-              </h2>
-              <p className="text-sm text-gray-700 font-medium">
-                Kamu Menemukan Easter Egg 🎉
-              </p>
-            </div>
+        {/* Header */}
+        <div className="text-center mb-5">
+          <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-200 to-pink-200 rounded-3xl flex items-center justify-center animate-pulse">
+            <span className="text-6xl">🎁</span>
+          </div>
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-pink-900 mb-2">
+            WOW! Ketemu! 🎉
+          </h2>
+          <p className="text-sm text-gray-700 font-medium">
+            Kamu berhasil menemukan hadiah tersembunyi!
+          </p>
+        </div>
 
-            <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 border-2 border-orange-200 text-gray-700 mb-5">
-              <p className="text-sm leading-relaxed italic">
-                "Kamu itu istimewa, bukan hanya karena hari ulang tahunmu saja,  
-                tapi karena kehadiranmu membawa kebahagiaan bagi orang-orang di sekitarmu." 💕
-              </p>
-            </div>
+        {/* Pesan */}
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-300 mb-5">
+          <p className="text-center text-gray-800 leading-relaxed mb-4">
+            Selamat! Kamu hebat banget sampai mau cari-cari hadiah tersembunyi ini 🕵️‍♀️
+          </p>
+          <div className="bg-white rounded-xl p-4">
+            <p className="text-sm text-gray-700 font-semibold mb-2 text-center">
+              🎁 Hadiah Spesial
+            </p>
+            <p className="text-xs text-gray-600 text-center">
+              Sudah dipilihkan khusus untukmu!
+            </p>
+          </div>
+        </div>
 
-            <div className="bg-gradient-to-r from-orange-100 to-rose-100 rounded-xl p-4 border-2 border-orange-300 mb-5">
-              <p className="text-center font-bold text-orange-800 mb-2">
-                🎉Bonus! Hadiah Spesial Untukmu🎉
-              </p>
-              <p className="text-sm text-gray-700 text-center">
-                Karena kamu berhasil menemukan rahasia ini, ada hadiah tambahan spesial dari Shopee!
-              </p>
-            </div>
-
-            <button
-              onClick={() => setStep('gift')}
-              className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
-            >
-              Klaim Hadiah 🎁
-            </button>
-          </>
-        ) : (
-          // VIEW 2: HALAMAN HADIAH
-          <>
-            {/* Tombol Back */}
-            <button
-              onClick={() => setStep('main')}
-              className="absolute top-3 left-3 bg-white/40 backdrop-blur-md text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/70 active:scale-95 transition"
-            >
-              ←
-            </button>
-
-            <div className="text-center mb-5 pt-2">
-              <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-2xl flex items-center justify-center">
-                <span className="text-4xl">🎁</span>
-              </div>
-              <h3 className="text-2xl font-bold text-orange-600 mb-2">
-                Hadiah Spesial 🎁
-              </h3>
-              <p className="text-sm text-gray-700">
-                Ikuti langkah di bawah ini untuk klaim hadiahmu!
-              </p>
-            </div>
-
-            <ol className="text-sm text-left text-gray-700 list-decimal list-inside mb-4 space-y-2 bg-orange-50 p-4 rounded-xl">
-              <li>Klik tombol <strong>Buka Shopee</strong></li>
-              <li>Checkout barang pilihan</li>
+        {/* Instruksi */}
+        <div className="mb-5 space-y-3">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+            <p className="text-xs text-gray-700 font-semibold mb-2">📝 Cara Klaim:</p>
+            <ol className="text-xs text-gray-600 space-y-1 list-decimal list-inside">
+              <li>Klik tombol "Buka Shopee"</li>
+              <li>Checkout barang yang sudah dipilihkan</li>
               <li>Pilih pembayaran <strong>BRIVA</strong></li>
-              <li>Salin kode BRIVA</li>
-              <li>Kirim ke WhatsApp</li>
+              <li>Salin kode BRIVA yang muncul</li>
+              <li>Kirim kode ke WhatsApp</li>
             </ol>
+          </div>
 
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded mb-4">
-              <p className="text-xs text-gray-600">
-                <strong>Catatan:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WhatsApp, nanti akan dibayarkan 🎁
-              </p>
-            </div>
+          <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded-sm">
+            <p className="text-xs text-red-700">
+              <strong>⚠️ Penting:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WA, nanti akan dibayarkan. ini untuk menjaga privasi alamatmu 🔒
+            </p>
+          </div>
+        </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={() => window.open(shopeeCartLink, "_blank")}
-                className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition-transform flex items-center justify-center gap-2"
-              >
-                <span>🛍️</span>
-                <span>Buka Shopee</span>
-              </button>
+        {/* Buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={() => window.open(shopeeCartLink, "_blank")}
+            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+            style={{ minHeight: '48px' }}
+          >
+            <span>🛍️</span>
+            <span>Buka Shopee</span>
+          </button>
 
-              <button
-                onClick={handleWhatsApp}
-                className="w-full bg-green-500 text-white py-3 rounded-lg font-bold shadow active:scale-95 transition-transform flex items-center justify-center gap-2"
-              >
-                <span>💬</span>
-                <span>Kirim ke WhatsApp</span>
-              </button>
-            </div>
-          </>
-        )}
+          <button
+            onClick={handleWhatsApp}
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+            style={{ minHeight: '48px' }}
+          >
+            <span>💬</span>
+            <span>Kirim Kode BRIVA</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -804,8 +856,14 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
     { id: 'plants', name: '🌿 Tanaman', position: { left: '42%', top: '55%', width: '16%', height: '15%' }, action: 'plant' },
     { id: 'lamp', name: '💡 Lampu', position: { left: '44%', top: '5%', width: '12%', height: '25%' }, action: 'lamp' },
     { id: 'sidetable', name: '☕ Meja Samping', position: { left: '85%', top: '58%', width: '14%', height: '15%' }, action: 'table' },
-    { id: 'Photo', name: 'Foto', position: { left: '4%', top: '50%', width: '12%', height: '15%' }, action: 'gallery' },
-    { id: 'window', name: '🪟 Jendela', position: { left: '60%', top: '20%', width: '40%', height: '35%' }, action: 'exit' }
+    { id: 'Photo', name: 'Foto', position: { left: '4%', top: '50%', width: '12%', height: '10%' }, action: 'gallery' },
+    { id: 'window', name: '🪟 Jendela', position: { left: '60%', top: '20%', width: '40%', height: '35%' }, action: 'exit' },
+    ...(showSecretHotspot ? [{
+    id: 'secret_drawer',
+    name: '🎁 Laci Rahasia',
+    position: { left: '8%', top: '68%', width: '12%', height: '10%' }, // Posisi laci lemari bawah
+    action: 'secret_gift'
+  }] : [])
 
   ];
 
@@ -826,6 +884,13 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
     if (action === 'lamp') {
       setLampOn(!lampOn);
       playSound(lampOn ? 400 : 800, 100);
+      return;
+    }
+
+     if (action === 'secret_gift') {
+      playSound(1500, 300);
+      vibrate([100, 50, 100]);
+      setActiveModal('secret_gift');
       return;
     }
 
@@ -1001,6 +1066,7 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
       {activeModal === 'table' && <TableModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'gallery' && <GalleryModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'easteregg' && <EasterEggModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'secret_gift' && <SecretGiftModal onClose={() => setActiveModal(null)} />}
     </div>
   );
 
