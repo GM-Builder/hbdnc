@@ -31,3 +31,36 @@ body {
     text-wrap: balance;
   }
 }
+
+body {
+  max-width: 430px; 
+  margin: 0 auto;
+  background-color: #000;
+}
+
+#__next {
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+  @media (min-width: 768px) {
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #faa66e 0%, #ee2c97 100%);
+      min-height: 100vh;
+    }
+    
+    #root, #__next {
+      max-width: 430px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+  }
+
+.font-hand {
+  font-family: 'Patrick Hand', cursive;
+}

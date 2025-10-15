@@ -3,7 +3,20 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        {/* Tambahkan font dari Google Fonts di sini */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* Meta viewport juga sebaiknya di dalam Head */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </Head>
+
       <body>
         <Main />
         <NextScript />
