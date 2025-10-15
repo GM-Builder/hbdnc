@@ -97,7 +97,7 @@ const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-rose-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
           aria-label="Tutup"
         >
           ✕
@@ -114,11 +114,11 @@ const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
             <p className="text-rose-700 text-sm font-medium">16 Oktober 2025</p>
           </div>
         </div>
-        <p className="text-gray-800 leading-relaxed text-center mb-4">
+        <p className="text-[12px] text-gray-800 leading-relaxed text-center mb-4">
           Di hari istimewa ini, semoga segala kebaikan datang menghampirimu.  
           Semoga hatimu ringan, harimu penuh warna, dan senyummu menular bahagia untuk dunia 🌸
         </p>
-        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-4 text-sm text-gray-700 mb-6">
+        <div className="text-[12px] bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-4 text-sm text-gray-700 mb-6">
           <p className="font-semibold mb-3 text-rose-700">Doaku untukmu:</p>
           <ul className="space-y-2">
             <li>💕 Selalu diberi kesehatan & kekuatan</li>
@@ -192,7 +192,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => {
             <h3 className="font-bold text-rose-700 mb-2">
               Chapter 1 — Pertemuan
             </h3>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-[12.5px] text-gray-700 leading-relaxed">
               Semua dimulai di live streaming <strong>Dramabite</strong>.  
               Kamu pakai baju warna pink dan keliatan lagi bengong 😄.  
               Aku gak tau kenapa, tapi momen itu nyantol terus di kepala.
@@ -204,7 +204,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => {
             <h3 className="font-bold text-orange-700 mb-2">
               Chapter 2 — Dm Pertama
             </h3>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-[12.5px] text-gray-700 leading-relaxed">
               DM pertama itu waktu kamu bilang ada host sombong banget karena kamu di blokir 😄.
                
             </p>
@@ -215,7 +215,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => {
             <h3 className="font-bold text-red-700 mb-2">
               Chapter 3 — Baby Duck (dutch) Pancake
             </h3>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-[12.5px] text-gray-700 leading-relaxed">
               Waktu itu aku pulang kampung naik motor dari Jakarta,
               padahal biasanya naik bis. Alasannya? Biar bisa mampir ketemu
               kamu dulu. Kedengarannya nekat, tapi worth it kok 😌.
@@ -227,7 +227,7 @@ const BookModal: React.FC<ModalProps> = ({ onClose }) => {
             <h3 className="font-bold text-pink-700 mb-2">
               Chapter 4 — Sekarang
             </h3>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-[12.5px] text-gray-700 leading-relaxed">
               Sekarang mungkin jarang ketemu, tapi aku masih inget semua
               obrolan, tawa, dan caramu cerita dengan antusias. Aku cuma mau
               bilang: kamu orang baik, dan aku selalu menghargai setiap
@@ -292,7 +292,7 @@ const GiftModal: React.FC<ModalProps> = ({ onClose }) => {
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
           aria-label="Tutup"
         >
           ✕
@@ -304,31 +304,31 @@ const GiftModal: React.FC<ModalProps> = ({ onClose }) => {
             <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-rose-200 to-orange-200 rounded-2xl flex items-center justify-center transform rotate-12">
               <span className="text-5xl transform -rotate-12">🎁</span>
             </div>
-            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600">
+            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600">
               Hadiah Spesial Untukmu
             </h2>
           </div>
-          <div className="space-y-4 mb-6">
+          <div className="space-y-4 mb-4">
             <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-2xl p-5 border-2 border-rose-200">
-              <h3 className="font-bold text-rose-800 mb-2">💌 Hadiah Pertama: Doa Terbaik</h3>
-              <p className="text-sm text-gray-700">
+              <h3 className="text-sm font-bold text-rose-800 mb-2">💌 Hadiah Pertama: Doa Terbaik</h3>
+              <p className="text-xs text-gray-700">
                 Semoga langkahmu selalu diberi kemudahan, dan hatimu tenang menghadapi hari-hari yang baru.
               </p>
             </div>
             <div className="bg-gradient-to-r from-orange-50 to-peach-50 rounded-2xl p-5 border-2 border-orange-200">
-              <h3 className="font-bold text-orange-800 mb-2">🌷 Hadiah Kedua: Kebahagiaan</h3>
-              <p className="text-sm text-gray-700">
+              <h3 className="text-sm font-bold text-orange-800 mb-2">🌷 Hadiah Kedua: Kebahagiaan</h3>
+              <p className="text-xs text-gray-700">
                 Semoga setiap detik hidupmu terasa hangat, bahkan saat dunia sedang dingin.
               </p>
             </div>
             <div className="bg-gradient-to-r from-peach-50 to-rose-50 rounded-2xl p-5 border-2 border-peach-200">
-              <h3 className="font-bold text-peach-800 mb-2">💻 Hadiah Ketiga: Website Ini</h3>
-              <p className="text-sm text-gray-700">
+              <h3 className="text-sm font-bold text-peach-800 mb-2">💻 Hadiah Ketiga: Website Ini</h3>
+              <p className="text-xs text-gray-700">
                 Dibuat dengan sepenuh hati, sebagai bentuk kecil dari rasa sayang dan perhatian 💖
               </p>
             </div>
           </div>
-          <p className="text-xs text-center text-gray-400 italic mb-4">
+          <p className="text-[9px] text-center text-gray-400 italic mb-4">
             (Bukan hadiah mahal, tapi dibuat dari hati 😄)
           </p>
           <button onClick={onClose} className="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">
@@ -358,7 +358,7 @@ const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
           aria-label="Tutup"
         >
           ✕
@@ -409,7 +409,7 @@ const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-rose-400  text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
           aria-label="Tutup"
         >
           ✕
@@ -458,7 +458,7 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
           aria-label="Tutup"
         >
           ✕
@@ -473,15 +473,15 @@ const CatModal: React.FC<ModalProps> = ({ onClose }) => (
             <p className="text-gray-600 text-sm mt-1">Pesan dari para kucing</p>
           </div>
           <div className="space-y-3 mb-6">
-            <div className="bg-orange-50 rounded-xl p-4 border-2 border-orange-200 text-black">
+            <div className="text-sm bg-orange-50 rounded-xl p-4 border-2 border-orange-200 text-black">
               🐱 <strong className='text-orange-600'>Kucing Oren:</strong> “Hidup emang nggak selalu lembut, tapi kamu tuh tangguh banget.  
                 Jangan lupa makan dan istirahat, ya.. dunia masih butuh senyummu.” 🍜💛
             </div>
-            <div className="bg-gradient-to-r from-rose-400 to-orange-400 rounded-xl p-4 border-2 border-gray-200 text-gray-200">
+            <div className="text-sm bg-gradient-to-r from-rose-400 to-orange-400 rounded-xl p-4 border-2 border-gray-200 text-gray-200">
               😺 <strong className='text-white'>Kucing Putih:</strong> “Kamu itu baik, unik, dan pantas hidup dengan caramu sendiri.  
                 Jangan biarkan dunia kecil bikin kamu berhenti bermimpi." 💫
             </div>
-            <div className="bg-slate-50 rounded-xl p-4 border-2 border-slate- text-black">
+            <div className="text-sm bg-slate-50 rounded-xl p-4 border-2 border-slate- text-black">
               🐈 <strong>Kucing Hitam:</strong> “Aku tahu kamu pernah ngerasa gelap banget di dalam sana...  
                 tapi bahkan malam pun punya bintang.  
                 Dan kamu, tanpa sadar, udah jadi salah satu cahayanya.” ✨
@@ -673,7 +673,7 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
+      className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
     >
       {/* 🧭 Tombol Close di pojok kanan atas */}
         <button
@@ -692,10 +692,10 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
           <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
             <span className="text-5xl">🎁</span>
           </div>
-          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600 mb-1">
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-rose-600 mb-1">
             SELAMAT!
           </h2>
-          <p className="text-sm text-gray-700 font-medium">
+          <p className="text-sm text-gray-50 font-medium">
             Kamu Menemukan Easter Egg 🎉
           </p>
         </div>
@@ -713,16 +713,16 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
           <div className="text-center mb-3">
             <span className="text-4xl">🗺️</span>
           </div>
-          <p className="text-center font-bold text-orange-800 mb-2">
+          <p className="text-sm text-center font-bold text-orange-800 mb-2">
             Ada Hadiah Tersembunyi Untukmu!
           </p>
-          <p className="text-sm text-gray-700 text-center mb-3">
+          <p className="text-xs text-gray-700 text-center mb-3">
             Petunjuk: Cari di <strong>laci lemari</strong> bagian bawah... 
             Ada sesuatu yang spesial menunggumu di sana! 👀
           </p>
           <div className="bg-white/70 rounded-lg p-3 text-center">
             <p className="text-xs text-gray-600 italic">
-              💡 Hint: Lihat di sebelah kiri bawah lemari buku!
+              💡 Hint: Harus kamu cari!
             </p>
           </div>
         </div>
@@ -774,33 +774,28 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
             <span className="text-6xl">🎁</span>
           </div>
           <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-pink-900 mb-2">
-            WOW! Ketemu! 🎉
-          </h2>
-          <p className="text-sm text-gray-700 font-medium">
-            Kamu berhasil menemukan hadiah tersembunyi!
+            WOW! Ketemu!🎉
+           </h2>
+          <p className="text-[11px] text-gray-700 font-medium">
+          Kamu berhasil menemukan hadiah tersembunyi!
           </p>
         </div>
 
         {/* Pesan */}
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-300 mb-5">
-          <p className="text-center text-gray-800 leading-relaxed mb-4">
-            Selamat! Kamu hebat banget sampai mau cari-cari hadiah tersembunyi ini 🕵️‍♀️
-          </p>
-          <div className="bg-white rounded-xl p-4">
-            <p className="text-sm text-gray-700 font-semibold mb-2 text-center">
+        <div className="bg-white rounded-xl p-4 mb-2">
+            <p className="text-xs text-gray-700 font-semibold mb-2 text-center">
               🎁 Hadiah Spesial
             </p>
-            <p className="text-xs text-gray-600 text-center">
+            <p className="text-[10px] text-gray-600 text-center">
               Sudah dipilihkan khusus untukmu!
             </p>
-          </div>
         </div>
 
         {/* Instruksi */}
-        <div className="mb-5 space-y-3">
+        <div className="mb-3 space-y-3">
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
             <p className="text-xs text-gray-700 font-semibold mb-2">📝 Cara Klaim:</p>
-            <ol className="text-xs text-gray-600 space-y-1 list-decimal list-inside">
+            <ol className="text-[10px] text-gray-600 space-y-1 list-decimal list-inside">
               <li>Klik tombol "Buka Shopee"</li>
               <li>Checkout barang yang sudah dipilihkan</li>
               <li>Pilih pembayaran <strong>BRIVA</strong></li>
@@ -810,7 +805,7 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
           </div>
 
           <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded-sm">
-            <p className="text-xs text-red-700">
+            <p className="text-[9px] text-red-700">
               <strong>⚠️ Penting:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WA, nanti akan dibayarkan. ini untuk menjaga privasi alamatmu 🔒
             </p>
           </div>
@@ -823,7 +818,6 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
             className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
             style={{ minHeight: '48px' }}
           >
-            <span>🛍️</span>
             <span>Buka Shopee</span>
           </button>
 
@@ -832,7 +826,6 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
             className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
             style={{ minHeight: '48px' }}
           >
-            <span>💬</span>
             <span>Kirim Kode BRIVA</span>
           </button>
         </div>
@@ -856,7 +849,7 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
     { id: 'plants', name: '🌿 Tanaman', position: { left: '42%', top: '55%', width: '16%', height: '15%' }, action: 'plant' },
     { id: 'lamp', name: '💡 Lampu', position: { left: '44%', top: '5%', width: '12%', height: '25%' }, action: 'lamp' },
     { id: 'sidetable', name: '☕ Meja Samping', position: { left: '85%', top: '58%', width: '14%', height: '15%' }, action: 'table' },
-    { id: 'Photo', name: 'Foto', position: { left: '4%', top: '50%', width: '12%', height: '10%' }, action: 'gallery' },
+    { id: 'Photo', name: 'Foto', position: { left: '14%', top: '50%', width: '12%', height: '10%' }, action: 'gallery' },
     { id: 'window', name: '🪟 Jendela', position: { left: '60%', top: '20%', width: '40%', height: '35%' }, action: 'exit' },
     ...(showSecretHotspot ? [{
     id: 'secret_drawer',
