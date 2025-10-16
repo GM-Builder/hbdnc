@@ -741,7 +741,19 @@ const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
 };
 
 const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
-  const shopeeCartLink = "https://s.shopee.co.id/11mSjCEQF";
+  // Array of Shopee links - akan dipilih secara random
+  const shopeeLinks = [
+    "https://s.shopee.co.id/11mSjCEQF",
+    "https://s.shopee.co.id/2qLzevnYJS", 
+    "https://s.shopee.co.id/2Vj9GHldry"
+  ];
+  
+  // Pilih link random saat modal dibuka
+  const [shopeeCartLink] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * shopeeLinks.length);
+    return shopeeLinks[randomIndex];
+  });
+  
   const whatsappNumber = "6282213955753";
 
   const handleWhatsApp = () => {
