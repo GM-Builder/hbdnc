@@ -402,9 +402,9 @@ const InteractiveBirthdayRoom = () => {
     const [selectedGift, setSelectedGift] = useState<number | null>(null);
 
     const gifts = [
-      { id: 1, label: 'Box A', emoji: '🚗', title: 'Jalan-jalan ke Bandung', desc: 'Petualangan seru menikmati sejuknya kota kembang berdua.' },
-      { id: 2, label: 'Box B', emoji: '🏨', title: 'Staycation Hotel Jakarta', desc: 'Waktu santai, berenang, dan dimanja di hotel mewah Jakarta.' },
-      { id: 3, label: 'Box C', emoji: '🛍️', title: 'Jajan Sepuasnya', desc: 'Pesta kuliner atau belanja impianmu, budget 500rb – 1 Juta!' },
+      { id: 1, label: 'Box A', emoji: '🚗', title: 'Jalan-jalan ke Bandung', desc: 'Petualangan seru menikmati sejuknya kota kembang berdua! Yuk healing bareng Ayang.' },
+      { id: 2, label: 'Box B', emoji: '🏨', title: 'Staycation Hotel Jakarta', desc: 'Waktu santai, berenang, dan dimanja di hotel mewah Jakarta bareng suami tercinta.' },
+      { id: 3, label: 'Box C', emoji: '🛍️', title: 'Jajan Sepuasnya', desc: 'Bebas jajan atau belanja apapun yang Cuti mau, sepuasnya!' },
     ];
 
     const handleSelect = (id: number) => {
@@ -489,9 +489,9 @@ const InteractiveBirthdayRoom = () => {
     const [selectedGift, setSelectedGift] = useState<number | null>(null);
 
     const gifts = [
-      { id: 1, label: 'Box X', emoji: '🍽️', title: 'Makan Malam Romantis', desc: 'Dinner berdua di restoran pilihan Cuti, malam yang hangat dan berkesan.' },
-      { id: 2, label: 'Box Y', emoji: '🎬', title: 'Nonton Bioskop + Makan', desc: 'Pilih film favorit, nikmati popcorn, dan makan enak bareng Ayang.' },
-      { id: 3, label: 'Box Z', emoji: '💆', title: 'Skincare / Perawatan Favorit', desc: 'Bebas pilih skincare atau perawatan kecantikan yang Cuti inginkan.' },
+      { id: 1, label: 'Box X', emoji: '🍽️', title: 'Makan Sepuasnya', desc: 'Bebas makan di mana aja dan pesan apa aja yang Cuti mau, sepuasnya!' },
+      { id: 2, label: 'Box Y', emoji: '🎬', title: 'Nonton Sepuasnya', desc: 'Nonton film favorit di bioskop atau di rumah, bebas pilih sepuasnya!' },
+      { id: 3, label: 'Box Z', emoji: '🛒', title: 'Belanja Sepuasnya', desc: 'Belanja skincare, baju, atau apapun yang Cuti inginkan, sepuasnya!' },
     ];
 
     const handleSelect = (id: number) => {
