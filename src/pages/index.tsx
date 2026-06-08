@@ -1215,11 +1215,7 @@ const InteractiveBirthdayRoom = () => {
         {hotspots.map((spot) => (
           <div
             key={spot.id}
-            className={`absolute cursor-pointer z-20 rounded-lg border-2 ${
-              clickedObjects.includes(spot.id) 
-                ? 'border-emerald-400/40 bg-emerald-400/10' 
-                : 'border-dashed border-amber-400/50 bg-amber-400/5 hover:border-amber-500'
-            } transition-all`}
+            className="absolute cursor-pointer z-20 border-0 bg-transparent"
             style={{
               left: spot.position.left,
               top: spot.position.top,
