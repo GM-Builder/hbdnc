@@ -1267,15 +1267,7 @@ const InteractiveBirthdayRoom = () => {
       {activeModal === 'easteregg' && <EasterEggModal onClose={() => setActiveModal(null)} />}
 
       {activeModal === 'secret_gift' && (
-        secretGiftOpened ? (
-          <AlreadyOpenedModal 
-            title="Laci Rahasia Terbuka! 💖" 
-            desc="Laci Rahasia sudah dibuka! Kamu telah mendapatkan Voucher Peluk & Cium Kening spesial dari suamimu." 
-            onClose={() => setActiveModal(null)} 
-          />
-        ) : (
-          <SecretGiftModal onClose={() => setActiveModal(null)} />
-        )
+        <SecretGiftModal onClose={() => setActiveModal(null)} />
       )}
     </div>
   );
