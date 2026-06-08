@@ -1233,27 +1233,11 @@ const InteractiveBirthdayRoom = () => {
       {activeModal === 'book' && <BookModal onClose={() => setActiveModal(null)} />}
       
       {activeModal === 'gift1' && (
-        gift1Opened ? (
-          <AlreadyOpenedModal 
-            title="Jalan-jalan ke Bandung 🚗💨" 
-            desc="Kado 1 sudah dibuka! Petualangan seru menikmati sejuknya kota kembang bersama suamiku tercinta." 
-            onClose={() => setActiveModal(null)} 
-          />
-        ) : (
-          <Gift1Modal onClose={() => setActiveModal(null)} />
-        )
+        <Gift1Modal onClose={() => setActiveModal(null)} />
       )}
 
       {activeModal === 'gift2' && (
-        gift2Opened ? (
-          <AlreadyOpenedModal 
-            title="Staycation Hotel Jakarta 🏨✨" 
-            desc="Kado 2 sudah dibuka! Menikmati waktu santai, berenang, dan dimanja di hotel mewah Jakarta bersama suami." 
-            onClose={() => setActiveModal(null)} 
-          />
-        ) : (
-          <Gift2Modal onClose={() => setActiveModal(null)} />
-        )
+        <Gift2Modal onClose={() => setActiveModal(null)} />
       )}
 
       {activeModal === 'balloon' && <BalloonModal onClose={() => setActiveModal(null)} />}
