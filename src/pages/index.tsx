@@ -194,7 +194,7 @@ const InteractiveBirthdayRoom = () => {
         source.connect(analyser);
 
         const checkBlow = () => {
-          if (candleBlown) return;
+          if (!audioCtxRef.current || !streamRef.current) return;
           analyser.getByteFrequencyData(dataArray);
           let sum = 0;
           for (let i = 0; i < bufferLength; i++) {
