@@ -26,6 +26,24 @@ const InteractiveBirthdayRoom = () => {
   const [gift1Opened, setGift1Opened] = useState<boolean>(false);
   const [gift2Opened, setGift2Opened] = useState<boolean>(false);
   const [secretGiftOpened, setSecretGiftOpened] = useState<boolean>(false);
+  const [selectedGift1, setSelectedGift1] = useState<number | null>(null);
+  const [selectedGift2, setSelectedGift2] = useState<number | null>(null);
+
+  // Sync states from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const g1 = localStorage.getItem('selectedGift1');
+      if (g1) {
+        setSelectedGift1(parseInt(g1, 10));
+        setGift1Opened(true);
+      }
+      const g2 = localStorage.getItem('selectedGift2');
+      if (g2) {
+        setSelectedGift2(parseInt(g2, 10));
+        setGift2Opened(true);
+      }
+    }
+  }, []);
 
   // Audio elements & helper functions
   const playSound = (frequency = 800, duration = 150, type: OscillatorType = 'sine') => {
@@ -399,8 +417,6 @@ const InteractiveBirthdayRoom = () => {
 
   // 🎁 GiftModal for Kado 1 — 3 selectable main gifts
   const Gift1Modal: React.FC<ModalProps> = ({ onClose }) => {
-    const [selectedGift, setSelectedGift] = useState<number | null>(null);
-
     const gifts = [
       { id: 1, label: 'Box A', emoji: '🚗', title: 'Jalan-jalan ke Bandung', desc: 'Petualangan seru menikmati sejuknya kota kembang berdua! Yuk healing bareng Ayang.' },
       { id: 2, label: 'Box B', emoji: '🏨', title: 'Staycation Hotel Jakarta', desc: 'Waktu santai, berenang, dan dimanja di hotel mewah Jakarta bareng suami tercinta.' },
@@ -408,11 +424,15 @@ const InteractiveBirthdayRoom = () => {
     ];
 
     const handleSelect = (id: number) => {
-      setSelectedGift(id);
+      setSelectedGift1(id);
+      setGift1Opened(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('selectedGift1', id.toString());
+        localStorage.setItem('gift1Opened', 'true');
+      }
       playSound(1000, 250);
       triggerModalConfetti();
       vibrate([50, 50, 100]);
-      setGift1Opened(true);
     };
 
     const handleClaim = (title: string) => {
@@ -443,7 +463,7 @@ const InteractiveBirthdayRoom = () => {
             <p className="text-xs text-emerald-700 mt-1">Pilih salah satu kotak misteri di bawah untuk membukanya! 🌸</p>
           </div>
 
-          {selectedGift === null ? (
+          {selectedGift1 === null ? (
             <div className="grid grid-cols-3 gap-3 py-4">
               {gifts.map((g) => (
                 <div
@@ -458,21 +478,15 @@ const InteractiveBirthdayRoom = () => {
             </div>
           ) : (
             <div className="bg-[#EAF2F0] rounded-2xl p-5 border border-[#D3E5E0] text-center">
-              <span className="text-4xl block mb-2 animate-bounce">{gifts.find(g => g.id === selectedGift)?.emoji}</span>
+              <span className="text-4xl block mb-2 animate-bounce">{gifts.find(g => g.id === selectedGift1)?.emoji}</span>
               <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">Pilihan Kamu:</p>
-              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift)?.title}</h3>
+              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift1)?.title}</h3>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift)?.title || '')}
+                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift1)?.title || '')}
                   className="flex-1 bg-[#84B082] text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-[#729c70] active:scale-95 transition-all"
                 >
                   Klaim ke Suami 💌
-                </button>
-                <button
-                  onClick={() => setSelectedGift(null)}
-                  className="px-4 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl font-medium text-xs hover:bg-gray-50 active:scale-95 transition-all"
-                >
-                  Ganti
                 </button>
               </div>
             </div>
@@ -486,8 +500,6 @@ const InteractiveBirthdayRoom = () => {
 
   // 🎁 GiftModal for Kado 2 — 3 smaller supplementary gifts
   const Gift2Modal: React.FC<ModalProps> = ({ onClose }) => {
-    const [selectedGift, setSelectedGift] = useState<number | null>(null);
-
     const gifts = [
       { id: 1, label: 'Box X', emoji: '🍽️', title: 'Makan Sepuasnya', desc: 'Bebas makan di mana aja dan pesan apa aja yang Cuti mau, sepuasnya!' },
       { id: 2, label: 'Box Y', emoji: '🎬', title: 'Nonton Sepuasnya', desc: 'Nonton film favorit di bioskop atau di rumah, bebas pilih sepuasnya!' },
@@ -495,10 +507,14 @@ const InteractiveBirthdayRoom = () => {
     ];
 
     const handleSelect = (id: number) => {
-      setSelectedGift(id);
+      setSelectedGift2(id);
+      setGift2Opened(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('selectedGift2', id.toString());
+        localStorage.setItem('gift2Opened', 'true');
+      }
       playSound(900, 220);
       vibrate([50, 50, 80]);
-      setGift2Opened(true);
     };
 
     const handleClaim = (title: string) => {
@@ -529,7 +545,7 @@ const InteractiveBirthdayRoom = () => {
             <p className="text-xs text-emerald-700 mt-1">Pilih salah satu kotak pita di bawah! 💕</p>
           </div>
 
-          {selectedGift === null ? (
+          {selectedGift2 === null ? (
             <div className="grid grid-cols-3 gap-3 py-4">
               {gifts.map((g) => (
                 <div
@@ -544,21 +560,15 @@ const InteractiveBirthdayRoom = () => {
             </div>
           ) : (
             <div className="bg-[#EAF2F0] rounded-2xl p-5 border border-[#D3E5E0] text-center">
-              <span className="text-4xl block mb-2">{gifts.find(g => g.id === selectedGift)?.emoji}</span>
+              <span className="text-4xl block mb-2">{gifts.find(g => g.id === selectedGift2)?.emoji}</span>
               <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">Pilihan Kamu:</p>
-              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift)?.title}</h3>
+              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift2)?.title}</h3>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift)?.title || '')}
+                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift2)?.title || '')}
                   className="flex-1 bg-[#84B082] text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-[#729c70] active:scale-95 transition-all"
                 >
                   Klaim ke Suami 💌
-                </button>
-                <button
-                  onClick={() => setSelectedGift(null)}
-                  className="px-4 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl font-medium text-xs hover:bg-gray-50 active:scale-95 transition-all"
-                >
-                  Ganti
                 </button>
               </div>
             </div>
