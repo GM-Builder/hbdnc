@@ -3,27 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --foreground-rgb: 47, 62, 53; /* Deep sage gray */
+  --background-start-rgb: 242, 246, 245; /* Soft sage mist */
+  --background-end-rgb: 226, 236, 233; /* Sage green light */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
-      transparent,
+      rgb(var(--background-start-rgb)),
       rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    );
+  font-family: 'Quicksand', sans-serif;
 }
 
 @layer utilities {
@@ -32,64 +24,85 @@ body {
   }
 }
 
-  @media (min-width: 768px) {
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #faa66e 0%, #ee2c97 100%);
-      min-height: 100vh;
-    }
-    
-    #root, #__next {
-      max-width: 430px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      border-radius: 24px;
-      overflow: hidden;
-    }
+@media (min-width: 768px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #d3e5e0 0%, #b8d0c8 100%);
+    min-height: 100vh;
   }
+  
+  #root, #__next {
+    max-width: 430px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(71, 91, 84, 0.15);
+    border-radius: 28px;
+    overflow: hidden;
+  }
+}
 
+/* Custom font utilities */
 .font-hand {
   font-family: 'Patrick Hand', cursive;
 }
 
-/* 🌸 Smooth scrollbar styling for modals & mobile */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-quicksand {
+  font-family: 'Quicksand', sans-serif;
+}
+
+/* Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
 
 * {
-  -ms-overflow-style: none;  /* untuk Internet Explorer dan Edge */
-  scrollbar-width: none;     /* untuk Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #f9a8d4, #fdba74); /* rose-300 → orange-300 */
-  border-radius: 9999px;
+/* Interactive ribbon/bow styling */
+.ribbon-bow {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #fb7185, #f97316); /* rose-400 → orange-500 */
+/* Candle flame flicker animation */
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.1) rotate(3deg) translateY(-1px); filter: drop-shadow(0 0 10px rgba(253, 186, 116, 0.8)); }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.flame-animation {
+  animation: flame-flicker 0.6s infinite ease-in-out;
 }
 
-/* 🌿 Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
 }
 
-/* 🔸 Untuk iPhone & iPad: biar scroll halus tanpa bounce glitch */
-body {
-  -webkit-overflow-scrolling: touch;
+.float-animation {
+  animation: float 4s infinite ease-in-out;
 }
 
-/* 🌸 Optional: sembunyikan scrollbar di modal jika tidak perlu */
+/* Cute micro-scale on hover/active */
+.btn-cute {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.btn-cute:active {
+  transform: scale(0.95);
+}
+
 .modal-scroll {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(249, 168, 212, 0.6) transparent;
+  scrollbar-width: none;
 }
+
 

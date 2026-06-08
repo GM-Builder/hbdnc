@@ -6,7 +6,7 @@ export default function Document() {
       <Head>
         {/* Tambahkan font dari Google Fonts di sini */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Quicksand:wght@300..700&display=swap"
           rel="stylesheet"
         />
 

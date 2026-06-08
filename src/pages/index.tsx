@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import confetti from "canvas-confetti";
-
+import React, { useEffect, useState, useRef } from 'react';
+import confetti from 'canvas-confetti';
 
 declare global {
   interface Window {
@@ -12,12 +11,10 @@ interface ModalProps {
   onClose: () => void;
 }
 
-
-
 const InteractiveBirthdayRoom = () => {
   const [clickedObjects, setClickedObjects] = useState<string[]>([]);
   const [touchStartX, setTouchStartX] = useState<number>(0);
-  const [lampOn, setLampOn] = useState<boolean>(false);
+  const [lampOn, setLampOn] = useState<boolean>(true); 
   const [ceilingTaps, setCeilingTaps] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<string>('landing');
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -25,20 +22,59 @@ const InteractiveBirthdayRoom = () => {
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const [showSecretHotspot, setShowSecretHotspot] = useState<boolean>(false);
 
+  // Gift open once states
+  const [gift1Opened, setGift1Opened] = useState<boolean>(false);
+  const [gift2Opened, setGift2Opened] = useState<boolean>(false);
+  const [secretGiftOpened, setSecretGiftOpened] = useState<boolean>(false);
 
-  const playSound = (frequency = 800, duration = 100) => {
-    if (typeof window !== 'undefined' && window.AudioContext) {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.frequency.value = frequency;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration / 1000);
+  // Audio elements & helper functions
+  const playSound = (frequency = 800, duration = 150, type: OscillatorType = 'sine') => {
+    if (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = frequency;
+        oscillator.type = type;
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration / 1000);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const playBlowSound = () => {
+    if (typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const bufferSize = audioContext.sampleRate * 0.3;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioContext.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000;
+        
+        const gain = audioContext.createGain();
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioContext.destination);
+        noise.start();
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -48,833 +84,937 @@ const InteractiveBirthdayRoom = () => {
     }
   };
 
-
-  const [audio] = useState(() => {
-  if (typeof window !== 'undefined') {
-    const audioElement = new Audio('/song.mp3');
-    audioElement.loop = true; // Loop terus
-    audioElement.volume = 0.3; // Volume 30%
-    return audioElement;
-  }
-  return null;
-});
-
-  // MODAL COMPONENTS - Warm Peach/Coral Theme
-
-// 🎂 CakeModal — pembuka & ucapan utama
-const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-      const duration = 2 * 1000; // 2 detik
-      const end = Date.now() + duration;
-
-      (function frame() {
-        confetti({
-          particleCount: 5,
-          startVelocity: 30,
-          spread: 360,
-          origin: { x: Math.random(), y: Math.random() - 0.2 }
-        });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      })();
-    }, []);
-
-  return (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-rose-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-rose-200 via-orange-100 to-peach-100 rounded-3xl p-8 shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto mb-4 bg-rose-300 rounded-full flex items-center justify-center">
-            <span className="text-4xl">🎂</span>
-          </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 mb-4">
-            <h2 className="text-4xl font-hand font-bold text-rose-600 mb-2">Nicaa</h2>
-            <h2 className="text-3xl font-hand font-bold text-rose-600 mb-2">HAPPY BIRTHDAY</h2>
-            <p className="text-rose-700 text-sm font-medium">16 Oktober 2025</p>
-          </div>
-        </div>
-        <p className="text-[12px] text-gray-800 leading-relaxed text-center mb-4">
-          Di hari istimewa ini, semoga segala kebaikan datang menghampirimu.  
-          Semoga hatimu ringan, harimu penuh warna, dan senyummu menular bahagia untuk dunia 🌸
-        </p>
-        <div className="text-[12px] bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-4 text-sm text-gray-700 mb-6">
-          <p className="font-semibold mb-3 text-rose-700">Doaku untukmu:</p>
-          <ul className="space-y-2">
-            <li>💕 Selalu diberi kesehatan & kekuatan</li>
-            <li>💕 Rezeki lancar & keberkahan berlimpah</li>
-            <li>💕 Dikelilingi orang-orang yang tulus</li>
-            <li>💕 Diberi ketenangan dan kebahagiaan setiap hari</li>
-          </ul>
-        </div>
-        <button onClick={onClose} className="w-full bg-white text-rose-600 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">
-          Lanjut Yuk
-        </button>
-      </div>
-    </div>
-  </div>
-);
-};
-
-// 📖 BookModal — Cerita Nyata Kita
-const BookModal: React.FC<ModalProps> = ({ onClose }) => {
-
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-
-    return () => {
-      const y = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      window.scrollTo(0, parseInt(y || "0") * -1);
-    };
+    if (typeof window !== 'undefined') {
+      const audioElement = new Audio('/song.mp3');
+      audioElement.loop = true;
+      audioElement.volume = 0.25;
+      setAudio(audioElement);
+      
+      return () => {
+        audioElement.pause();
+      };
+    }
   }, []);
-  
-  return(
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
+
+  const triggerModalConfetti = () => {
+    const duration = 2.5 * 1000;
+    const end = Date.now() + duration;
+    const colors = ['#A3C9A8', '#84B082', '#E2ECE9', '#B8D0C8', '#FFF9E6', '#FFF0F5'];
+
+    (function frame() {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  };
+
+  // 🎂 CakeModal with Microphone blow support
+  const CakeModal: React.FC<ModalProps> = ({ onClose }) => {
+    const [candleBlown, setCandleBlown] = useState<boolean>(false);
+    const [micPermission, setMicPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+    const [isListening, setIsListening] = useState<boolean>(false);
+    const streamRef = useRef<MediaStream | null>(null);
+    const audioCtxRef = useRef<AudioContext | null>(null);
+
+    const handleBlow = () => {
+      if (!candleBlown) {
+        setCandleBlown(true);
+        playBlowSound();
+        triggerModalConfetti();
+        vibrate([100, 50, 100]);
+        stopMicListening();
+      }
+    };
+
+    const stopMicListening = () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close();
+        audioCtxRef.current = null;
+      }
+      setIsListening(false);
+    };
+
+    const startMicListening = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        streamRef.current = stream;
+        setMicPermission('granted');
+        setIsListening(true);
+
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContextClass();
+        audioCtxRef.current = audioCtx;
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        source.connect(analyser);
+
+        const checkBlow = () => {
+          if (candleBlown) return;
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+          }
+          const average = sum / bufferLength;
+
+          // If sound level is high (blowing into the mic)
+          if (average > 65) {
+            handleBlow();
+          } else {
+            requestAnimationFrame(checkBlow);
+          }
+        };
+
+        requestAnimationFrame(checkBlow);
+      } catch (err) {
+        console.error("Microphone access error:", err);
+        setMicPermission('denied');
+        setIsListening(false);
+      }
+    };
+
+    useEffect(() => {
+      return () => {
+        stopMicListening();
+      };
+    }, [candleBlown]);
+
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
         >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-3xl overflow-hidden shadow-2xl">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-rose-400 to-orange-400 p-6 text-center">
-          <span className="text-4xl block mb-3">📖</span>
-          <h2 className="text-3xl font-bold text-white drop-shadow-lg">
-            Memory Book
-          </h2>
-          <p className="text-orange-100 text-sm mt-1">
-            Cerita kita yang aneh tapi nyata 💫
-          </p>
-        </div>
-
-        {/* Isi Buku */}
-        <div className="p-6 space-y-4">
-          {/* Chapter 1 */}
-          <div className="bg-white/90 rounded-xl p-4 border-l-4 border-rose-400 shadow">
-            <h3 className="font-bold text-rose-700 mb-2">
-              Chapter 1 — Pertemuan
-            </h3>
-            <p className="text-[12.5px] text-gray-700 leading-relaxed">
-              Semua dimulai di live streaming <strong>Dramabite</strong>.  
-              Kamu pakai baju warna pink dan keliatan lagi bengong 😄.  
-              Aku gak tau kenapa, tapi momen itu nyantol terus di kepala.
-            </p>
-          </div>
-
-          {/* Chapter 2 */}
-          <div className="bg-white/90 rounded-xl p-4 border-l-4 border-orange-400 shadow">
-            <h3 className="font-bold text-orange-700 mb-2">
-              Chapter 2 — Dm Pertama
-            </h3>
-            <p className="text-[12.5px] text-gray-700 leading-relaxed">
-              DM pertama itu waktu kamu bilang ada host sombong banget karena kamu di blokir 😄.
-               
-            </p>
-          </div>
-
-          {/* Chapter 3 */}
-          <div className="bg-white/90 rounded-xl p-4 border-l-4 border-red-400 shadow">
-            <h3 className="font-bold text-red-700 mb-2">
-              Chapter 3 — Baby Duck (dutch) Pancake
-            </h3>
-            <p className="text-[12.5px] text-gray-700 leading-relaxed">
-              Waktu itu aku pulang kampung naik motor dari Jakarta,
-              padahal biasanya naik bis. Alasannya? Biar bisa mampir ketemu
-              kamu dulu. Kedengarannya nekat, tapi worth it kok 😌.
-            </p>
-          </div>
-
-          {/* Chapter 4 */}
-          <div className="bg-white/90 rounded-xl p-4 border-l-4 border-pink-400 shadow">
-            <h3 className="font-bold text-pink-700 mb-2">
-              Chapter 4 — Sekarang
-            </h3>
-            <p className="text-[12.5px] text-gray-700 leading-relaxed">
-              Sekarang mungkin jarang ketemu, tapi aku masih inget semua
-              obrolan, tawa, dan caramu cerita dengan antusias. Aku cuma mau
-              bilang: kamu orang baik, dan aku selalu menghargai setiap
-              ceritamu, keluh kesahmu, dan canda tawamu. Karena ya, kamu cukup
-              jadi dirimu sendiri aja 💕
-            </p>
-          </div>
-        </div>
-
-        {/* Tombol Tutup */}
-        <div className="p-6 pt-0">
           <button
-           onClick={(e) => {
-              e.stopPropagation(); // cegah klik tembus ke backdrop
-              onClose();
-            }}
-            className="w-full bg-gradient-to-r from-rose-400 to-orange-400 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform"
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+            aria-label="Tutup"
           >
-            Tutup Buku 📖
+            ✕
+          </button>
+
+          <div className="text-center mb-6">
+            <div className="inline-block px-3 py-1 bg-[#E2ECE9] rounded-full text-xs font-semibold text-emerald-800 tracking-wider mb-3">
+              🎀 HARI SPESIALNYA AYANG 🎀
+            </div>
+            <h2 className="text-3xl font-playfair font-black text-emerald-950 leading-tight">
+              Yeni Anggriani Putri
+            </h2>
+            <p className="text-sm font-semibold text-emerald-700 font-quicksand mt-1">
+              Ulang Tahun yang Ke-28 • 8 Juni 2026
+            </p>
+          </div>
+
+          <div className="bg-[#EAF2F0] rounded-2xl p-5 mb-5 flex flex-col items-center justify-center border border-[#D3E5E0]">
+            <p className="text-xs text-emerald-800 font-bold mb-4 text-center">
+              {candleBlown 
+                ? "✨ Lilin Berhasil Ditiup! Make a wish... ✨" 
+                : "🕯️ Ketuk lilin untuk tiup atau gunakan Mic!"}
+            </p>
+            
+            <div 
+              onClick={handleBlow}
+              className={`cursor-pointer transition-transform duration-300 relative flex flex-col items-center mb-4 ${candleBlown ? '' : 'hover:scale-105'}`}
+            >
+              {!candleBlown ? (
+                <div className="w-6 h-8 bg-amber-400 rounded-full flame-animation relative flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">
+                  <div className="w-3 h-5 bg-yellow-200 rounded-full"></div>
+                </div>
+              ) : (
+                <div className="h-8 flex items-center justify-center text-xs text-gray-500 italic">
+                  💨 *puff*
+                </div>
+              )}
+              <div className="w-0.5 h-2 bg-gray-700"></div>
+              <div className="w-4 h-16 bg-gradient-to-r from-emerald-400 to-emerald-300 rounded-t shadow-inner relative overflow-hidden flex flex-col justify-between py-1">
+                <div className="w-full h-1 bg-white/40"></div>
+                <div className="w-full h-1 bg-white/40"></div>
+                <div className="w-full h-1 bg-white/40"></div>
+              </div>
+              <div className="w-16 h-2 bg-amber-200 rounded-full shadow-md mt-0.5"></div>
+            </div>
+
+            {!candleBlown && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isListening) {
+                    stopMicListening();
+                  } else {
+                    startMicListening();
+                  }
+                }}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 ${
+                  isListening 
+                    ? 'bg-red-400 text-white hover:bg-red-500' 
+                    : 'bg-[#84B082] text-white hover:bg-[#729c70]'
+                }`}
+              >
+                <span>🎤</span> {isListening ? 'Matikan Mikrofon' : 'Tiup Pakai Mic'}
+              </button>
+            )}
+
+            {candleBlown && (
+              <p className="text-[11px] text-emerald-700 mt-2 text-center italic">
+                "Semoga semua harapan, mimpi, dan doa terbaikmu di umur 28 ini dikabulkan oleh Allah SWT. Amin."
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-3 font-quicksand text-xs text-emerald-950 leading-relaxed text-left bg-white p-4 rounded-xl border border-emerald-100/50">
+            <p className="font-semibold text-sm text-emerald-800 border-b border-emerald-100 pb-2 flex items-center gap-1.5">
+              <span>🧸</span> Pesan Manis untuk Cuti:
+            </p>
+            <p>
+              Selamat ulang tahun yang ke-28 untuk istri tercintaku, belahan jiwaku. 💖
+            </p>
+            <p>
+              Meskipun hari lahirmu sudah lewat sedikit, rasa sayang, syukur, dan cinta yang kumiliki untukmu tidak pernah berkurang sedetik pun. Aku sangat beruntung memiliki Ayang yang sehebat, secantik, dan sehangat dirimu di sisiku.
+            </p>
+            <p>
+              Terima kasih telah menemani perjalananku sejak kita bersama di November 2019, hingga akhirnya kita melangkah ke pelaminan yang indah di Desember 2025. Selamat membuka lembaran baru yang manis di usiamu yang ke-28 ini, Cuti sayang.
+            </p>
+            <p className="font-semibold text-center text-emerald-800 pt-2 border-t border-[#EAF2F0] mt-3">
+              I Love You More Than Words Can Say! 🎀
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-full mt-5 bg-[#84B082] text-white py-3 rounded-xl font-bold font-quicksand shadow-md hover:bg-[#729c70] active:scale-95 transition-all text-sm"
+          >
+            Lanjut Jelajahi Kamar 🧸
           </button>
         </div>
       </div>
+    );
+  };
+
+  // 📖 BookModal
+  const BookModal: React.FC<ModalProps> = ({ onClose }) => {
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-6">
+            <span className="text-4xl block mb-2">📖</span>
+            <h2 className="text-2xl font-playfair font-black text-emerald-950">Memory Book</h2>
+            <p className="text-xs text-emerald-700 italic mt-0.5">Kisah perjalanan cinta kita 🤍</p>
+          </div>
+
+          <div className="space-y-4 font-quicksand">
+            <div className="bg-white p-4 rounded-2xl border-l-4 border-[#84B082] shadow-sm">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-600 block mb-1">
+                November 2019
+              </span>
+              <h3 className="font-bold text-sm text-emerald-950 mb-1">Awal Kisah Kita 💖</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                Pertama kali langkah kita dipertemukan. Saat itulah kita mulai berjalan berdampingan, saling mengenal, berbagi tawa, dan menyusun mimpi-mimpi sederhana bersama Cuti.
+              </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border-l-4 border-amber-300 shadow-sm">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-amber-600 block mb-1">
+                2020 - 2024
+              </span>
+              <h3 className="font-bold text-sm text-emerald-950 mb-1">Tumbuh Bersama 🌱</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                Tahun-tahun penuh petualangan, suka, dan duka. Kita belajar mengerti satu sama lain, menguatkan ketika lelah, dan yakin bahwa kita diciptakan untuk saling melengkapi.
+              </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border-l-4 border-emerald-400 shadow-sm">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-700 block mb-1">
+                Desember 2025
+              </span>
+              <h3 className="font-bold text-sm text-emerald-950 mb-1">Janji Suci Pernikahan 💍</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                Hari paling bersejarah saat kita berjanji di hadapan-Nya untuk hidup semati. Dari teman perjalanan kini resmi menjadi teman hidup selamanya untuk saling menyayangi.
+              </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border-l-4 border-red-300 shadow-sm">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-red-500 block mb-1">
+                Juni 2026
+              </span>
+              <h3 className="font-bold text-sm text-emerald-950 mb-1">Ulang Tahun Ke-28 Cuti ✨</h3>
+              <p className="text-xs text-gray-700 leading-relaxed">
+                Sekarang di usiamu yang ke-28, kita merayakannya bersama di bawah atap yang sama. Semoga cinta kita terus bertumbuh subur dan rumah tangga kita penuh berkah.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-full mt-6 bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+          >
+            Tutup Buku Cerita 📚
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // 🎁 GiftModal for Kado 1 — 3 selectable main gifts
+  const Gift1Modal: React.FC<ModalProps> = ({ onClose }) => {
+    const [selectedGift, setSelectedGift] = useState<number | null>(null);
+
+    const gifts = [
+      { id: 1, label: 'Box A', emoji: '🚗', title: 'Jalan-jalan ke Bandung', desc: 'Petualangan seru menikmati sejuknya kota kembang berdua.' },
+      { id: 2, label: 'Box B', emoji: '🏨', title: 'Staycation Hotel Jakarta', desc: 'Waktu santai, berenang, dan dimanja di hotel mewah Jakarta.' },
+      { id: 3, label: 'Box C', emoji: '🛍️', title: 'Jajan Sepuasnya', desc: 'Pesta kuliner atau belanja impianmu, budget 500rb – 1 Juta!' },
+    ];
+
+    const handleSelect = (id: number) => {
+      setSelectedGift(id);
+      playSound(1000, 250);
+      triggerModalConfetti();
+      vibrate([50, 50, 100]);
+      setGift1Opened(true);
+    };
+
+    const handleClaim = (title: string) => {
+      const waNumber = '6282213955753';
+      const message = encodeURIComponent(`Halo suamiku sayang! ❤️ Aku sudah buka Kado 1 (Mystery Box) dan isinya: "${title}". Makasih banyak ya sayang! 🥰`);
+      window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
+    };
+
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-5">
+            <span className="text-4xl block mb-2">🎁✨</span>
+            <h2 className="text-2xl font-playfair font-black text-emerald-950">Mystery Box Utama</h2>
+            <p className="text-xs text-emerald-700 mt-1">Pilih salah satu kotak misteri di bawah untuk membukanya! 🌸</p>
+          </div>
+
+          {selectedGift === null ? (
+            <div className="grid grid-cols-3 gap-3 py-4">
+              {gifts.map((g) => (
+                <div
+                  key={g.id}
+                  onClick={() => handleSelect(g.id)}
+                  className="cursor-pointer group flex flex-col items-center justify-center p-4 bg-white border-2 border-[#D3E5E0] rounded-2xl shadow-sm hover:border-[#84B082] hover:shadow-md active:scale-95 transition-all text-center"
+                >
+                  <span className="text-4xl mb-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">🎁</span>
+                  <span className="text-xs font-bold text-emerald-950">{g.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-[#EAF2F0] rounded-2xl p-5 border border-[#D3E5E0] text-center">
+              <span className="text-4xl block mb-2 animate-bounce">{gifts.find(g => g.id === selectedGift)?.emoji}</span>
+              <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">Pilihan Kamu:</p>
+              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift)?.title}</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift)?.title || '')}
+                  className="flex-1 bg-[#84B082] text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-[#729c70] active:scale-95 transition-all"
+                >
+                  Klaim ke Suami 💌
+                </button>
+                <button
+                  onClick={() => setSelectedGift(null)}
+                  className="px-4 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl font-medium text-xs hover:bg-gray-50 active:scale-95 transition-all"
+                >
+                  Ganti
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="text-[10px] text-center text-gray-400 italic mt-4">(Hanya bisa dibuka 1x — pilih dengan bijak! 😄)</p>
+        </div>
+      </div>
+    );
+  };
+
+  // 🎁 GiftModal for Kado 2 — 3 smaller supplementary gifts
+  const Gift2Modal: React.FC<ModalProps> = ({ onClose }) => {
+    const [selectedGift, setSelectedGift] = useState<number | null>(null);
+
+    const gifts = [
+      { id: 1, label: 'Box X', emoji: '🍽️', title: 'Makan Malam Romantis', desc: 'Dinner berdua di restoran pilihan Cuti, malam yang hangat dan berkesan.' },
+      { id: 2, label: 'Box Y', emoji: '🎬', title: 'Nonton Bioskop + Makan', desc: 'Pilih film favorit, nikmati popcorn, dan makan enak bareng Ayang.' },
+      { id: 3, label: 'Box Z', emoji: '💆', title: 'Skincare / Perawatan Favorit', desc: 'Bebas pilih skincare atau perawatan kecantikan yang Cuti inginkan.' },
+    ];
+
+    const handleSelect = (id: number) => {
+      setSelectedGift(id);
+      playSound(900, 220);
+      vibrate([50, 50, 80]);
+      setGift2Opened(true);
+    };
+
+    const handleClaim = (title: string) => {
+      const waNumber = '6282213955753';
+      const message = encodeURIComponent(`Halo suamiku sayang! ❤️ Aku sudah buka Kado 2 (Mystery Box tambahan) dan isinya: "${title}". Makasih banyak ya sayang! 🥰`);
+      window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank');
+    };
+
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-5">
+            <span className="text-4xl block mb-2">🎀✨</span>
+            <h2 className="text-2xl font-playfair font-black text-emerald-950">Mystery Box Tambahan</h2>
+            <p className="text-xs text-emerald-700 mt-1">Pilih salah satu kotak pita di bawah! 💕</p>
+          </div>
+
+          {selectedGift === null ? (
+            <div className="grid grid-cols-3 gap-3 py-4">
+              {gifts.map((g) => (
+                <div
+                  key={g.id}
+                  onClick={() => handleSelect(g.id)}
+                  className="cursor-pointer group flex flex-col items-center justify-center p-4 bg-white border-2 border-[#D3E5E0] rounded-2xl shadow-sm hover:border-[#84B082] hover:shadow-md active:scale-95 transition-all text-center"
+                >
+                  <span className="text-4xl mb-2 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">🎁</span>
+                  <span className="text-xs font-bold text-emerald-950">{g.label}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-[#EAF2F0] rounded-2xl p-5 border border-[#D3E5E0] text-center">
+              <span className="text-4xl block mb-2">{gifts.find(g => g.id === selectedGift)?.emoji}</span>
+              <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">Pilihan Kamu:</p>
+              <h3 className="text-base font-bold text-emerald-950 mb-3">{gifts.find(g => g.id === selectedGift)?.title}</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleClaim(gifts.find(g => g.id === selectedGift)?.title || '')}
+                  className="flex-1 bg-[#84B082] text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-[#729c70] active:scale-95 transition-all"
+                >
+                  Klaim ke Suami 💌
+                </button>
+                <button
+                  onClick={() => setSelectedGift(null)}
+                  className="px-4 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl font-medium text-xs hover:bg-gray-50 active:scale-95 transition-all"
+                >
+                  Ganti
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="text-[10px] text-center text-gray-400 italic mt-4">(Hanya bisa dibuka 1x — pilih yang paling kamu mau! 💖)</p>
+        </div>
+      </div>
+    );
+  };
+
+  // Already Opened Gift Card Modal
+  const AlreadyOpenedModal: React.FC<{ title: string; desc: string; onClose: () => void }> = ({ title, desc, onClose }) => {
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl text-center"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+          >
+            ✕
+          </button>
+          <span className="text-5xl block mb-3 opacity-60">🔒</span>
+          <h2 className="text-xl font-playfair font-black text-emerald-950 mb-2">Kado Ini Sudah Dibuka</h2>
+          <div className="bg-[#EAF2F0] rounded-xl p-4 border border-emerald-100 mb-4 text-left">
+            <p className="font-bold text-xs text-emerald-900 mb-1">{title}</p>
+            <p className="text-[11px] text-gray-600 leading-relaxed">{desc}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-full bg-[#84B082] text-white py-2.5 rounded-xl font-bold text-xs shadow-sm hover:bg-[#729c70] active:scale-95 transition-all"
+          >
+            Kembali
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // 📸 GalleryModal
+  const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const images = [
+      "/foto/foto1.jpg",
+      "/foto/foto2.jpg",
+      "/foto/foto3.jpg",
+      "/foto/foto4.jpg",
+      "/foto/foto5.jpg",
+      "/foto/foto6.jpg",
+    ];
+
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-emerald-800 text-xl w-8 h-8 rounded-full flex items-center justify-center hover:bg-emerald-100 active:scale-95 transition-all"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-5">
+            <span className="text-4xl block mb-2">📸</span>
+            <h2 className="text-2xl font-playfair font-black text-emerald-950">Galeri Foto Kenangan</h2>
+            <p className="text-xs text-emerald-700 mt-1">Senyum manismu selalu terekam di hati 🤍</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {images.map((src, i) => (
+              <div
+                key={i}
+                onClick={() => setSelectedImage(src)}
+                className="cursor-pointer bg-white p-2 border border-gray-200 rounded-lg shadow-sm hover:-translate-y-1 transition-transform"
+              >
+                <div className="w-full aspect-[4/3] bg-gray-100 overflow-hidden rounded mb-1">
+                  <img
+                    src={src}
+                    alt={`Kenangan ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=400&auto=format&fit=crop`;
+                    }}
+                  />
+                </div>
+                <div className="text-[10px] text-center text-gray-500 font-medium">Memory {i + 1}</div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+          >
+            Tutup Galeri 📷
+          </button>
+        </div>
+
+        {selectedImage && (
+          <div
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 bg-black/95 flex items-center justify-center z-[60] p-4"
+          >
+            <div className="relative max-w-full max-h-[80vh] flex flex-col items-center">
+              <img
+                src={selectedImage}
+                alt="Zoomed memory"
+                className="max-w-[95vw] max-h-[75vh] object-contain rounded-xl border-4 border-white shadow-2xl"
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="mt-4 bg-white/20 text-white px-4 py-2 rounded-full text-xs font-semibold hover:bg-white/30 transition-all"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // 🎈 BalloonModal
+  const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl text-center"
+      >
+        <div className="flex justify-center gap-3 mb-4 animate-bounce">
+          <span className="text-4xl">🎈</span>
+          <span className="text-3xl">🎀</span>
+          <span className="text-4xl">🎈</span>
+        </div>
+        
+        <h2 className="text-2xl font-playfair font-black text-emerald-950 mb-2">Harapan Terbang Tinggi</h2>
+        <p className="text-xs text-gray-700 leading-relaxed font-quicksand mb-6">
+          Seperti balon-balon ceria ini yang membubung tinggi ke awan, semoga setiap doa yang dipanjatkan terbang tinggi melintasi langit dan dikabulkan seluruhnya.
+        </p>
+
+        <div className="bg-[#EAF2F0] rounded-xl p-4 text-left border border-[#D3E5E0] space-y-2 text-xs text-emerald-900 mb-6">
+          <p>🌟 Semoga Ayang selalu dipenuhi limpahan kesehatan & kebahagiaan</p>
+          <p>🤍 Semoga ikatan pernikahan kita semakin hari semakin kuat & berkah</p>
+          <p>🌸 Semoga Ayang dimudahkan mencapai segala impian di usiamu yang ke-28</p>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Amin, Ya Rabbal Alamin 🤍
+        </button>
+      </div>
     </div>
-  </div>
-);
-};
+  );
 
+  // 🪑 ChairModal
+  const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+      >
+        <div className="text-center mb-4">
+          <span className="text-4xl block mb-2">🪑</span>
+          <h2 className="text-2xl font-playfair font-black text-emerald-950">Sudut Istirahat Cuti</h2>
+          <p className="text-xs text-emerald-700 italic mt-0.5">Tempat ternyaman untuk melepas lelah</p>
+        </div>
 
-// 🎁 GiftModal — hadiah simbolis
-const GiftModal: React.FC<ModalProps> = ({ onClose }) => {
+        <p className="text-xs text-gray-700 leading-relaxed font-quicksand mb-5 text-center">
+          Dunia luar mungkin sibuk dan melelahkan, tapi ingatlah ada rumah yang selalu hangat untukmu. Duduklah santai di sini, tarik nafas panjang, dan rasakan kasih sayang yang selalu menunggumu pulang.
+        </p>
 
-   useEffect(() => {
-      const duration = 2 * 1000; // 2 detik
-      const end = Date.now() + duration;
+        <div className="bg-[#EAF2F0] rounded-xl p-4 border border-[#D3E5E0] mb-6">
+          <p className="text-xs text-emerald-800 italic text-center">
+            "Kamu tidak harus selalu berlari. Terkadang, beristirahat sejenak sambil ditemani segelas teh hangat adalah bentuk cinta terbaik untuk dirimu sendiri." 🍵
+          </p>
+        </div>
 
-      (function frame() {
-        confetti({
-          particleCount: 5,
-          startVelocity: 30,
-          spread: 360,
-          origin: { x: Math.random(), y: Math.random() - 0.2 }
-        });
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Kembali Santai 🤍
+        </button>
+      </div>
+    </div>
+  );
 
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      })();
+  // 😺 Cat1Modal (Si Oren Lucu)
+  const Cat1Modal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+      >
+        <div className="text-center mb-4">
+          <span className="text-4xl block mb-2">🐈</span>
+          <h2 className="text-2xl font-playfair font-black text-emerald-950">Si Oren Lucu</h2>
+          <p className="text-xs text-emerald-700 italic">Meow~ pesan manis pertama untukmu... 🐾</p>
+        </div>
+
+        <div className="bg-[#EAF2F0] p-4 rounded-xl border border-[#D3E5E0] text-emerald-950 text-xs font-quicksand leading-relaxed my-4">
+          "Meow~ Jangan lupa tersenyum ya hari ini, Cuti! Senyuman manis Cuti adalah hal terindah yang selalu bikin suami bersemangat setiap hari."
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Meow~ Terima Kasih! 🐾
+        </button>
+      </div>
+    </div>
+  );
+
+  // 😺 Cat2Modal (Si Putih Cantik)
+  const Cat2Modal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+      >
+        <div className="text-center mb-4">
+          <span className="text-4xl block mb-2">😺</span>
+          <h2 className="text-2xl font-playfair font-black text-emerald-950">Si Putih Cantik</h2>
+          <p className="text-xs text-emerald-700 italic">Meow~ ada doa baik di sini... 🐾</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl border border-gray-200 text-emerald-950 text-xs font-quicksand leading-relaxed my-4">
+          "Meow~ Semoga Cuti selalu diberikan kesehatan, kelancaran rezeki, dan selalu diliputi kebahagiaan di usia ke-28 ini."
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Meow~ Amin! 🐾
+        </button>
+      </div>
+    </div>
+  );
+
+  // 😺 Cat3Modal (Si Abu-Abu Manis)
+  const Cat3Modal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl"
+      >
+        <div className="text-center mb-4">
+          <span className="text-4xl block mb-2">🐈‍⬛</span>
+          <h2 className="text-2xl font-playfair font-black text-emerald-950">Si Abu-Abu Manis</h2>
+          <p className="text-xs text-emerald-700 italic">Meow~ sebuah harapan hangat... 🐾</p>
+        </div>
+
+        <div className="bg-[#EAF2F0] p-4 rounded-xl border border-gray-100 text-emerald-900 text-xs font-quicksand leading-relaxed my-4">
+          "Meow~ Tetaplah menjadi Cuti yang penyayang dan sabar ya. Kami mendoakan kebahagiaan rumah tanggamu selamanya."
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Meow~ Amin YRA! 🐾
+        </button>
+      </div>
+    </div>
+  );
+
+  // 🌿 PlantModal
+  const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl text-center"
+      >
+        <span className="text-4xl block mb-2">🌿</span>
+        <h2 className="text-2xl font-playfair font-black text-emerald-950 mb-2">Terus Tumbuh Bersama</h2>
+        <p className="text-xs text-gray-700 leading-relaxed font-quicksand mb-5">
+          Seperti tanaman hias cantik di kamar ini, semoga cinta dan kebersamaan kita terus bertumbuh subur, melahirkan dedaunan kasih baru, dan selalu segar penuh keberkahan di masa depan.
+        </p>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Tumbuh Bersama 🌱
+        </button>
+      </div>
+    </div>
+  );
+
+  // ☕ TableModal
+  const TableModal: React.FC<ModalProps> = ({ onClose }) => (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-[#FAF9F6] border-2 border-[#B8D0C8] rounded-3xl p-6 shadow-xl text-center"
+      >
+        <span className="text-4xl block mb-2">☕</span>
+        <h2 className="text-2xl font-playfair font-black text-emerald-950 mb-2">Meja Hangat Cerita</h2>
+        <p className="text-xs text-gray-700 leading-relaxed font-quicksand mb-5">
+          Meja kecil tempat kita biasa meletakkan secangkir kopi atau cemilan manis di malam hari. Semoga obrolan-obrolan hangat kita selalu hidup menemani malam-malam kita.
+        </p>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+        >
+          Mari Ngobrol Lagi 🤍
+        </button>
+      </div>
+    </div>
+  );
+
+  // Easter Egg Modal
+  const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
+    const handleShowClue = () => {
+      setShowSecretHotspot(true);
+      onClose();
+    };
+
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-sm bg-[#FAF9F6] border-2 border-yellow-300 rounded-3xl p-6 shadow-xl text-center"
+        >
+          <span className="text-5xl block mb-3 animate-bounce">✨🧸✨</span>
+          <h2 className="text-2xl font-playfair font-black text-[#6B8E23] mb-1">Wah, Ketemu!</h2>
+          <p className="text-xs text-emerald-800 font-bold mb-4">Kamu Menemukan Clue Rahasia! 🎉</p>
+          
+          <div className="bg-yellow-50 rounded-2xl p-4 border border-yellow-200 text-xs text-gray-700 leading-relaxed mb-5 text-left">
+            <p className="font-bold text-amber-800 mb-1">🎁 Petunjuk Hadiah Rahasia:</p>
+            <p>Ada area tersembunyi yang sekarang sudah aktif! Coba cari di bagian laci paling bawah dari rak laci lemari ya. Ada sesuatu yang menunggumu di sana! 👀</p>
+          </div>
+
+          <button
+            onClick={handleShowClue}
+            className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
+          >
+            Ayo Cari! 🔍
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Secret Gift Modal — restored to original sweet vouchers
+  const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
+    useEffect(() => {
+      setSecretGiftOpened(true);
     }, []);
 
-  return (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
+    const waNumber = '6281383521750';
+    const handleWhatsApp = () => {
+      const message = encodeURIComponent("Halo Ayang sayang! Aku berhasil menemukan Laci Rahasia di websitemu. 🎁 Aku klaim pelukan terhangat dan ciuman kening yaa hari ini! Love you! ❤️");
+      window.open(`https://wa.me/${waNumber}?text=${message}`, "_blank");
+    };
 
-      <div className="bg-gradient-to-br from-rose-300 via-orange-200 to-peach-200 rounded-3xl p-1 shadow-2xl">
-        <div className="bg-white rounded-3xl p-6">
-          <div className="text-center mb-6">
-            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-rose-200 to-orange-200 rounded-2xl flex items-center justify-center transform rotate-12">
-              <span className="text-5xl transform -rotate-12">🎁</span>
-            </div>
-            <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600">
-              Hadiah Spesial Untukmu
-            </h2>
-          </div>
-          <div className="space-y-4 mb-4">
-            <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-2xl p-5 border-2 border-rose-200">
-              <h3 className="text-sm font-bold text-rose-800 mb-2">💌 Hadiah Pertama: Doa Terbaik</h3>
-              <p className="text-xs text-gray-700">
-                Semoga langkahmu selalu diberi kemudahan, dan hatimu tenang menghadapi hari-hari yang baru.
-              </p>
-            </div>
-            <div className="bg-gradient-to-r from-orange-50 to-peach-50 rounded-2xl p-5 border-2 border-orange-200">
-              <h3 className="text-sm font-bold text-orange-800 mb-2">🌷 Hadiah Kedua: Kebahagiaan</h3>
-              <p className="text-xs text-gray-700">
-                Semoga setiap detik hidupmu terasa hangat, bahkan saat dunia sedang dingin.
-              </p>
-            </div>
-            <div className="bg-gradient-to-r from-peach-50 to-rose-50 rounded-2xl p-5 border-2 border-peach-200">
-              <h3 className="text-sm font-bold text-peach-800 mb-2">💻 Hadiah Ketiga: Website Ini</h3>
-              <p className="text-xs text-gray-700">
-                Dibuat dengan sepenuh hati, sebagai bentuk kecil dari rasa sayang dan perhatian 💖
-              </p>
-            </div>
-          </div>
-          <p className="text-[9px] text-center text-gray-400 italic mb-4">
-            (Bukan hadiah mahal, tapi dibuat dari hati 😄)
-          </p>
-          <button onClick={onClose} className="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">
-            Terima Kasih 🎀
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-};
-
-// 🎈 BalloonModal — harapan & semangat
-const BalloonModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-white rounded-3xl p-8 shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="flex justify-center gap-3 mb-4">
-            <div className="w-12 h-16 bg-rose-300 rounded-full"></div>
-            <div className="w-12 h-16 bg-blue-300 rounded-full"></div>
-            <div className="w-12 h-16 bg-peach-300 rounded-full"></div>
-          </div>
-          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-600">
-            Terbanglah Tinggi 🎈
-          </h2>
-        </div>
-        <p className="text-center text-gray-700 mb-6">
-          Balon-balon ini melambangkan mimpi dan harapanmu.  
-          Biarkan mereka terbang tinggi, tapi tetap ingat, kakimu selalu berpijak pada kebaikan.
-        </p>
-        <ul className="space-y-2 text-sm text-gray-700 mb-6">
-          <li>🌤️ Terus semangat walau hari terasa berat</li>
-          <li>💫 Jangan takut mencoba hal baru</li>
-          <li>💕 Percaya, kamu bisa lebih dari yang kamu pikir</li>
-        </ul>
-        <button onClick={onClose} className="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-          Aku Dukung Kamu 💪
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// 🪑 ChairModal — istirahat & refleksi diri
-const ChairModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-rose-400  text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-orange-100 to-rose-100 rounded-3xl p-8 shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto mb-3 bg-orange-200 rounded-2xl flex items-center justify-center">
-            <span className="text-5xl">🪑</span>
-          </div>
-          <h2 className="text-3xl font-bold text-orange-800">Kursi Favoritmu</h2>
-          <p className="text-orange-600 text-sm mt-1">Tempat paling nyaman untuk merenung</p>
-        </div>
-        <p className="text-gray-800 leading-relaxed mb-6">
-          Duduklah sejenak. Tarik napas pelan.  
-          Dunia bisa menunggu, kamu pantas mendapat waktu istirahat.  
-          Hanya untuk dirimu sendiri 💆‍♀️
-        </p>
-        <div className="bg-orange-50 rounded-xl p-4 border-l-4 border-orange-400 mb-6">
-          <p className="text-sm text-gray-700 italic">
-            “Kamu tidak harus produktif setiap waktu.  
-            Kadang yang kamu butuh cuma tenang, dan menikmati Tianlala.”
-          </p>
-        </div>
-        <button onClick={onClose} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-          Aku Siap Lagi ☕
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// 😺 CatModal — pesan manis & lucu
-const CatModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-orange-400 text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-peach-100 via-orange-100 to-rose-100 rounded-3xl p-1 shadow-2xl">
-        <div className="bg-white rounded-3xl p-6">
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-rose-600">
-              Meow~ 😸
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">Pesan dari para kucing</p>
-          </div>
-          <div className="space-y-3 mb-6">
-            <div className="text-sm bg-orange-50 rounded-xl p-4 border-2 border-orange-200 text-black">
-              🐱 <strong className='text-orange-600'>Kucing Oren:</strong> “Hidup emang nggak selalu lembut, tapi kamu tuh tangguh banget.  
-                Jangan lupa makan dan istirahat, ya.. dunia masih butuh senyummu.” 🍜💛
-            </div>
-            <div className="text-sm bg-gradient-to-r from-rose-400 to-orange-400 rounded-xl p-4 border-2 border-gray-200 text-gray-200">
-              😺 <strong className='text-white'>Kucing Putih:</strong> “Kamu itu baik, unik, dan pantas hidup dengan caramu sendiri.  
-                Jangan biarkan dunia kecil bikin kamu berhenti bermimpi." 💫
-            </div>
-            <div className="text-sm bg-slate-50 rounded-xl p-4 border-2 border-slate- text-black">
-              🐈 <strong>Kucing Hitam:</strong> “Aku tahu kamu pernah ngerasa gelap banget di dalam sana...  
-                tapi bahkan malam pun punya bintang.  
-                Dan kamu, tanpa sadar, udah jadi salah satu cahayanya.” ✨
-            </div>
-          </div>
-          <button onClick={onClose} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-            Meow~ Terima Kasih 🐾
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-// 🌿 PlantModal — makna pertumbuhan & harapan
-const PlantModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-green-400 to-teal-500 rounded-3xl p-8 shadow-2xl">
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-white drop-shadow-lg">Teruslah Tumbuh 🌱</h2>
-        </div>
-        <p className="text-gray-800 text-center bg-white/90 rounded-xl p-6 mb-6">
-          Seperti tanaman, kamu juga butuh waktu 
-          untuk tumbuh, mekar, dan bersinar dengan caramu sendiri 🌸
-        </p>
-        <button onClick={onClose} className="w-full bg-white text-green-600 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-          Aku Akan Tumbuh 🌿
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// ☕ TableModal — simbol kebersamaan
-const TableModal: React.FC<ModalProps> = ({ onClose }) => (
-  <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-      <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-3xl p-8 shadow-2xl border-4 border-orange-200">
-        <div className="text-center mb-6">
-          <span className="text-5xl block mb-3">☕</span>
-          <h2 className="text-3xl font-bold text-orange-800">Meja Cerita</h2>
-          <p className="text-orange-600 text-sm">Tempat tawa & kebersamaan</p>
-        </div>
-        <p className="text-gray-800 leading-relaxed mb-4 text-center">
-          Semoga selalu ada waktu untuk duduk bersama,  
-          bercerita, dan tertawa tanpa alasan ☕💬
-        </p>
-        <button onClick={onClose} className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-          Cerita Lagi Nanti 💛
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-const GalleryModal: React.FC<ModalProps> = ({ onClose }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const images = [
-    "/foto/foto1.jpg",
-    "/foto/foto2.jpg",
-    "/foto/foto3.jpg",
-    "/foto/foto4.jpg",
-    "/foto/foto5.jpg",
-    "/foto/foto6.jpg",
-  ];
-
-  return (
-    <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-        <div className="text-center mb-6">
-          <span className="text-4xl block mb-3">📸</span>
-          <h2 className="text-3xl font-bold text-white drop-shadow-lg">
-            Kamu dalam frame
-          </h2>
-          <p className="text-rose-200 text-sm mt-2">
-             Senyummu, ceritamu, semuanya terekam di sini 💕
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-          {images.map((src, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-2xl shadow-lg group"
-            >
-              <img
-                src={src}
-                alt={`gallery-${i}`}
-                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={onClose}
-          className="w-full bg-white text-rose-700 py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-lg"
-        >
-          Tutup Galeri 📷
-        </button>
-      </div>
-
-     {/* Modal Zoom Foto */}
-      {selectedImage && (
+    return (
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      >
         <div
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-sm bg-[#FAF9F6] border-2 border-emerald-300 rounded-3xl p-6 shadow-xl text-center"
         >
-          <img
-            src={selectedImage}
-            alt="zoom"
-            className="max-w-[90vw] max-h-[85vh] rounded-2xl shadow-2xl transition-transform scale-100"
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-
-const EasterEggModal: React.FC<ModalProps> = ({ onClose }) => {
-  
-  const handleShowClue = () => {
-    setShowSecretHotspot(true); // Aktifkan hotspot tersembunyi
-    onClose(); // Tutup modal
-  };
-
-  return (
-     <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="bg-gradient-to-br from-rose-800 to-orange-800 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-      {/* 🧭 Tombol Close di pojok kanan atas */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm text-white text-xl w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all"
-          aria-label="Tutup"
-        >
-          ✕
-        </button>
-
-        {/* Header */}
-        <div className="text-center mb-5">
-          <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-orange-200 to-rose-200 rounded-3xl flex items-center justify-center">
-            <span className="text-5xl">🎁</span>
-          </div>
-          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-rose-600 mb-1">
-            SELAMAT!
-          </h2>
-          <p className="text-sm text-gray-50 font-medium">
-            Kamu Menemukan Easter Egg 🎉
+          <span className="text-5xl block mb-3 animate-pulse">💖🧸💖</span>
+          <h2 className="text-2xl font-playfair font-black text-emerald-950 mb-2">Laci Rahasia Terbuka!</h2>
+          <p className="text-xs text-gray-700 leading-relaxed font-quicksand mb-5">
+            Hebat banget bisa nemu laci rahasia ini! Ini adalah bentuk pelukan hangat dariku untuk menyambut pertambahan usiamu yang ke-28 ini.
           </p>
-        </div>
 
-        {/* Pesan Spesial */}
-        <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 border-2 border-orange-200 text-gray-700 mb-5">
-          <p className="text-sm leading-relaxed italic text-center">
-            "Kamu itu istimewa, bukan hanya karena hari ulang tahunmu saja,  
-            tapi karena kehadiranmu membawa kebahagiaan bagi orang-orang di sekitarmu." 💕
-          </p>
-        </div>
-
-        {/* Petunjuk Hadiah */}
-        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-5 border-2 border-yellow-400 mb-5">
-          <div className="text-center mb-3">
-            <span className="text-4xl">🗺️</span>
+          <div className="bg-[#EAF2F0] rounded-xl p-4 border border-[#D3E5E0] text-xs text-emerald-900 text-left mb-6 space-y-1">
+            <p><strong>Hadiah Tambahan:</strong></p>
+            <p>✨ Voucher Peluk Manja Sepuasnya 🤗</p>
+            <p>✨ Voucher Cium Kening Sayang 😘</p>
+            <p>✨ Voucher Bebas Cemberut 1 Harian Penuh 🌸</p>
           </div>
-          <p className="text-sm text-center font-bold text-orange-800 mb-2">
-            Ada Hadiah Tersembunyi Untukmu!
-          </p>
-          <p className="text-xs text-gray-700 text-center mb-3">
-            Petunjuk: Cari di <strong>laci lemari</strong> bagian bawah... 
-            Ada sesuatu yang spesial menunggumu di sana! 👀
-          </p>
-          <div className="bg-white/70 rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600 italic">
-              💡 Hint: Harus kamu cari!
-            </p>
-          </div>
-        </div>
-
-        {/* Tombol */}
-        <button
-          onClick={handleShowClue}
-          className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform text-base"
-          style={{ minHeight: '48px' }}
-        >
-          Oke, Aku Cari! 🔍
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
-  // Array of Shopee links - akan dipilih secara random
-  const shopeeLinks = [
-    "https://s.shopee.co.id/11mSjCEQF",
-    "https://s.shopee.co.id/2qLzevnYJS", 
-    "https://s.shopee.co.id/2Vj9GHldry"
-  ];
-  
-  // Pilih link random saat modal dibuka
-  const [shopeeCartLink] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * shopeeLinks.length);
-    return shopeeLinks[randomIndex];
-  });
-  
-  const whatsappNumber = "6282213955753";
-
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent(
-      "Halo! Aku sudah checkout hadiah ulang tahun dari laci rahasia. Ini kode BRIVA-ku: "
-    );
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
-  };
-
-  return (
-    <div
-    onClick={onClose}
-    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 sm:p-6 overflow-y-auto modal-scroll"
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="bg-gradient-to-br from-rose-400 to-purple-200 rounded-3xl p-6 relative w-full max-w-sm sm:max-w-md mx-auto my-auto max-h-[90vh] overflow-y-auto modal-scroll"
-    >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 bg-white/40 text-gray-800 text-lg w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition"
-        >
-          ✕
-        </button>
-
-        {/* Header */}
-        <div className="text-center mb-5">
-          <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-200 to-pink-200 rounded-3xl flex items-center justify-center animate-pulse">
-            <span className="text-6xl">🎁</span>
-          </div>
-          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-900 to-pink-900 mb-2">
-            WOW! Ketemu!🎉
-           </h2>
-          <p className="text-[11px] text-gray-700 font-medium">
-          Kamu berhasil menemukan hadiah tersembunyi!
-          </p>
-        </div>
-
-        {/* Pesan */}
-        <div className="bg-white rounded-xl p-4 mb-2">
-            <p className="text-xs text-gray-700 font-semibold mb-2 text-center">
-              🎁 Hadiah Spesial
-            </p>
-            <p className="text-[10px] text-gray-600 text-center">
-              Sudah dipilihkan khusus untukmu!
-            </p>
-        </div>
-
-        {/* Instruksi */}
-        <div className="mb-3 space-y-3">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
-            <p className="text-xs text-gray-700 font-semibold mb-2">📝 Cara Klaim:</p>
-            <ol className="text-[10px] text-gray-600 space-y-1 list-decimal list-inside">
-              <li>Klik tombol "Buka Shopee"</li>
-              <li>Checkout barang yang sudah dipilihkan</li>
-              <li>Pilih pembayaran <strong>BRIVA</strong></li>
-              <li>Salin kode BRIVA yang muncul</li>
-              <li>Kirim kode ke WhatsApp</li>
-            </ol>
-          </div>
-
-          <div className="bg-red-50 border-l-4 border-red-400 p-3 rounded-sm">
-            <p className="text-[9px] text-red-700">
-              <strong>⚠️ Penting:</strong> Jangan bayar dulu! Kirim kode BRIVA ke WA, nanti akan dibayarkan. ini untuk menjaga privasi alamatmu 🔒
-            </p>
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="space-y-3">
-          <button
-            onClick={() => window.open(shopeeCartLink, "_blank")}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-            style={{ minHeight: '48px' }}
-          >
-            <span>Buka Shopee</span>
-          </button>
 
           <button
             onClick={handleWhatsApp}
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-            style={{ minHeight: '48px' }}
+            className="w-full bg-[#84B082] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#729c70] active:scale-95 transition-transform text-sm"
           >
-            <span>Kirim Kode BRIVA</span>
+            Kirim 💌
           </button>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-
-  // Hotspots configuration
+  // Hotspots definitions
   const hotspots = [
-    { id: 'cake', name: '🎂 Kue Ulang Tahun', position: { left: '42%', top: '72%', width: '16%', height: '10%' }, action: 'cake' },
-    { id: 'bookshelf', name: '📚 Rak Buku', position: { left: '8%', top: '28%', width: '25%', height: '20%' }, action: 'book' },
-    { id: 'gift1', name: '🎁 Hadiah 1', position: { left: '8%', top: '78%', width: '12%', height: '10%' }, action: 'gift' },
-    { id: 'gift2', name: '🎁 Hadiah 2', position: { left: '22%', top: '85%', width: '18%', height: '12%' }, action: 'gift' },
+    { id: 'cake', name: '🎂 Kue Ulang Tahun', position: { left: '42%', top: '72%', width: '16%', height: '5%' }, action: 'cake' },
+    { id: 'bookshelf', name: '📚 Buku Kenangan', position: { left: '8%', top: '28%', width: '25%', height: '20%' }, action: 'book' },
+    { id: 'gift1', name: '🎁 Kado 1', position: { left: '0%', top: '70%', width: '12%', height: '10%' }, action: 'gift1' },
+    { id: 'gift2', name: '🎁 Kado 2', position: { left: '22%', top: '85%', width: '18%', height: '12%' }, action: 'gift2' },
     { id: 'balloons', name: '🎈 Balon', position: { left: '40%', top: '30%', width: '12%', height: '20%' }, action: 'balloon' },
     { id: 'armchair', name: '🪑 Kursi Cozy', position: { left: '62%', top: '50%', width: '25%', height: '20%' }, action: 'chair' },
-    { id: 'cat1', name: '😺 Kucing 1', position: { left: '16%', top: '68%', width: '10%', height: '12%' }, action: 'cat' },
-    { id: 'cat2', name: '😺 Kucing 2', position: { left: '2%', top: '80%', width: '10%', height: '12%' }, action: 'cat' },
-    { id: 'cat3', name: '😺 Kucing 3', position: { left: '85%', top: '80%', width: '14%', height: '6%' }, action: 'cat' },
+    { id: 'cat1', name: '😺 Boneka Kucing Oren', position: { left: '16%', top: '68%', width: '10%', height: '12%' }, action: 'cat1' },
+    { id: 'cat2', name: '😺 Boneka Kucing Putih', position: { left: '2%', top: '80%', width: '10%', height: '12%' }, action: 'cat2' },
+    { id: 'cat3', name: '😺 Boneka Kucing Abu', position: { left: '85%', top: '80%', width: '14%', height: '6%' }, action: 'cat3' },
     { id: 'plants', name: '🌿 Tanaman', position: { left: '42%', top: '55%', width: '16%', height: '15%' }, action: 'plant' },
-    { id: 'lamp', name: '💡 Lampu', position: { left: '44%', top: '5%', width: '12%', height: '25%' }, action: 'lamp' },
+    { id: 'lamp', name: '💡 Lampu Utama', position: { left: '44%', top: '5%', width: '12%', height: '25%' }, action: 'lamp' },
     { id: 'sidetable', name: '☕ Meja Samping', position: { left: '85%', top: '58%', width: '14%', height: '15%' }, action: 'table' },
-    { id: 'Photo', name: 'Foto', position: { left: '14%', top: '50%', width: '12%', height: '10%' }, action: 'gallery' },
-    { id: 'window', name: '🪟 Jendela', position: { left: '60%', top: '20%', width: '40%', height: '35%' }, action: 'exit' },
+    { id: 'Photo', name: 'Foto Kenangan', position: { left: '14%', top: '50%', width: '12%', height: '10%' }, action: 'gallery' },
+    { id: 'window', name: '🪟 Pintu Keluar', position: { left: '60%', top: '20%', width: '40%', height: '35%' }, action: 'exit' },
     ...(showSecretHotspot ? [{
-    id: 'secret_drawer',
-    name: '🎁 Laci Rahasia',
-    position: { left: '8%', top: '68%', width: '12%', height: '10%' }, // Posisi laci lemari bawah
-    action: 'secret_gift'
-  }] : [])
-
+      id: 'secret_drawer',
+      name: '🎁 Laci Rahasia',
+      position: { left: '0%', top: '60%', width: '12%', height: '10%' },
+      action: 'secret_gift'
+    }] : [])
   ];
 
   const handleHotspotClick = (action: string, objectId: string): void => {
-    playSound(action === 'cake' ? 1200 : action === 'cat' ? 600 : 800, 150);
-    vibrate(action === 'cake' ? [50, 50, 50] : [50]); // <- pastikan ini array number
+    playSound(action === 'cake' ? 1000 : action === 'cat' ? 700 : 800, 150);
+    vibrate(action === 'cake' ? [50, 50, 50] : [50]);
 
     if (!clickedObjects.includes(objectId)) {
       setClickedObjects((prev: string[]) => [...prev, objectId]);
@@ -882,26 +1022,19 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
 
     if (action === 'exit') {
       setCurrentPage('landing');
-      playSound(600, 200);
+      playSound(500, 200);
       return;
     }
 
     if (action === 'lamp') {
       setLampOn(!lampOn);
-      playSound(lampOn ? 400 : 800, 100);
-      return;
-    }
-
-     if (action === 'secret_gift') {
-      playSound(1500, 300);
-      vibrate([100, 50, 100]);
-      setActiveModal('secret_gift');
+      playSound(lampOn ? 350 : 700, 100);
       return;
     }
 
     setActiveModal(action);
     
-    if (action === 'cake' || action === 'gift') {
+    if (action === 'cake' || action === 'gift1' || action === 'gift2' || action === 'secret_gift') {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
@@ -913,12 +1046,12 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
     
     if (newTaps >= 3) {
       setActiveModal('easteregg');
-      playSound(1500, 300);
+      playSound(1200, 300, 'triangle');
       vibrate([50, 100, 50]);
       setCeilingTaps(0);
     }
     
-    setTimeout(() => setCeilingTaps(0), 2000);
+    setTimeout(() => setCeilingTaps(0), 2500);
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>): void => {
@@ -933,37 +1066,57 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
     }
   };
 
-  const totalObjects = hotspots.length - 2;
-  const progress = Math.round((clickedObjects.length / totalObjects) * 100);
+  const totalObjects = hotspots.length - 2; // Subtract lamp and window from count
+  const progress = Math.round((clickedObjects.filter(id => id !== 'lamp' && id !== 'window').length / totalObjects) * 100);
 
+  // 🏡 LandingPage
   const LandingPage = () => (
-    <div className="min-h-screen flex items-center justify-center bg-pink-400 relative overflow-hidden px-4">
-      <div className="text-center z-10 max-w-md w-full">
-        <h1 className="text-2xl font-hand font-semibold text-gray-200 mb-12">
-          Hai, Nicaa! Mampir sini yuk 
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF9F6] relative overflow-hidden px-6 text-center">
+      <div className="absolute top-10 left-10 text-3xl opacity-20 float-animation select-none">🎈</div>
+      <div className="absolute top-20 right-12 text-3xl opacity-20 float-animation select-none" style={{ animationDelay: '1.5s' }}>🎀</div>
+      <div className="absolute bottom-20 left-12 text-3xl opacity-20 float-animation select-none" style={{ animationDelay: '2s' }}>🧸</div>
+      <div className="absolute bottom-12 right-16 text-3xl opacity-20 float-animation select-none" style={{ animationDelay: '0.5s' }}>🎈</div>
+
+      <div className="z-10 max-w-sm w-full space-y-6">
+        <div className="inline-block p-1.5 bg-[#E2ECE9] rounded-full mb-2 border border-[#B8D0C8]">
+          <span className="px-3 py-1 bg-white rounded-full text-[11px] font-bold text-emerald-800 tracking-wider block">
+            HAPPY BIRTHDAY AYANG 🎀
+          </span>
+        </div>
+
+        <h1 className="text-3xl font-playfair font-black text-emerald-950 leading-snug">
+          Hai, Sayangku Yeni Anggriani Putri! 🤍
         </h1>
         
+        <p className="text-xs text-emerald-800 font-medium font-quicksand leading-relaxed max-w-xs mx-auto">
+          Aku punya kejutan kecil di dalam ruangan ini khusus untuk ulang tahunmu yang ke-28. Mampir masuk sebentar yuk...
+        </p>
+
         <div 
-          onClick={() => setCurrentPage('room')}
-          className="cursor-pointer group mx-auto inline-block"
+          onClick={() => {
+            setCurrentPage('room');
+            if (audio && !isMusicPlaying) {
+              audio.play().catch(() => {});
+              setIsMusicPlaying(true);
+            }
+          }}
+          className="cursor-pointer group mx-auto inline-block pt-4"
         >
-          <div className="w-40 h-56 mx-auto bg-gradient-to-b from-pink-300 to-pink-500 rounded-t-3xl border-4 border-pink-600 shadow-2xl transform group-active:scale-95 transition-transform relative">
-            <div className="absolute top-1/2 left-6 w-3 h-3 bg-yellow-400 rounded-full shadow-lg"></div>
-            <div className="absolute top-1/2 left-6 w-2 h-6 bg-yellow-300 rounded-sm -ml-0.5 mt-3"></div>
-            <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-5xl filter drop-shadow-lg">
-              🚪
-            </div>
+          <div className="w-36 h-48 mx-auto bg-gradient-to-b from-[#E2ECE9] to-[#C4DED7] rounded-t-full border-4 border-[#84B082] shadow-lg transform group-hover:scale-105 group-active:scale-95 transition-all relative flex flex-col justify-end pb-8">
+            <div className="absolute top-[45%] left-5 w-3 h-3 bg-amber-400 rounded-full shadow-inner"></div>
+            <div className="text-3xl filter drop-shadow">🚪</div>
           </div>
-          <div className="w-40 h-6 mx-auto bg-pink-600 rounded-b-lg shadow-lg"></div>
+          <div className="w-40 h-3 mx-auto bg-[#84B082]/60 rounded-full mt-1"></div>
         </div>
         
-        <p className="mt-12 font-hand text-white text-sm">
-          Ketuk pintu untuk masuk
+        <p className="font-hand text-[#6B8E23] text-sm mt-4 tracking-wide">
+          *Ketuk pintu untuk masuk*
         </p>
       </div>
     </div>
   );
 
+  // 🏡 InteractiveRoom
   const InteractiveRoom = () => (
     <div 
       className="min-h-screen bg-black relative overflow-hidden"
@@ -972,18 +1125,18 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
     >
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
-          {[...Array(60)].map((_, i) => (
+          {[...Array(30)].map((_, i) => (
             <div
               key={i}
-              className="absolute text-2xl"
+              className="absolute text-xl"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: '-10%',
-                animation: `fall ${2 + Math.random() * 2}s linear forwards`,
-                animationDelay: `${Math.random() * 2}s`
+                animation: `fall ${2.5 + Math.random() * 2}s linear forwards`,
+                animationDelay: `${Math.random() * 1.5}s`
               }}
             >
-              {['🎉', '🎊', '🎈', '💝', '⭐', '🎂', '🌸', '💕'][Math.floor(Math.random() * 8)]}
+              {['🎉', '🎈', '💝', '⭐', '🌸', '🎀', '🧸'][Math.floor(Math.random() * 7)]}
             </div>
           ))}
         </div>
@@ -998,13 +1151,20 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
         }
       `}</style>
 
-      {/* Progress Tracker */}
-      <div className="fixed top-4 left-4 z-50 bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-white">
-            {clickedObjects.length}/{totalObjects}
+      {/* Top Banner Message */}
+      <div className="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
+        <div className="bg-[#FAF9F6]/95 border border-[#B8D0C8] px-3.5 py-1.5 rounded-full shadow-lg pointer-events-auto flex items-center gap-1.5">
+          <span className="text-[10px] font-bold text-emerald-800 tracking-wider">
+            Cari Objek: {clickedObjects.filter(id => id !== 'lamp' && id !== 'window').length}/{totalObjects}
           </span>
         </div>
+
+        <button
+          onClick={() => setCurrentPage('landing')}
+          className="bg-[#FAF9F6]/95 border border-[#B8D0C8] px-3 py-1.5 rounded-full shadow-lg pointer-events-auto text-[10px] font-bold text-emerald-800 active:scale-95 transition-all"
+        >
+          KLUAR 🚪
+        </button>
       </div>
 
       {/* Music Toggle - Di dekat meja (radio) */}
@@ -1019,22 +1179,23 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
           }
           playSound(isMusicPlaying ? 400 : 800, 100);
         }}
-        className="fixed z-10 p-2 active:scale-95 transition-transform"
-              style={{ top: '79%', right: '30%' }}
+        className="fixed z-40 p-2 active:scale-95 transition-transform"
+        style={{ top: '79%', right: '30%' }}
       >
         <div className="text-5xl">{isMusicPlaying ? '📻' : '📻'}</div>
       </button>
 
-      {/* Achievement */}
-      {progress === 100 && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-6 py-3 rounded-full shadow-2xl font-bold animate-pulse">
-          🏆 Semua objek ditemukan! 🎉
+      {/* Achievement Alert */}
+      {progress >= 100 && (
+        <div className="fixed top-16 left-4 right-4 z-40 bg-gradient-to-r from-emerald-100 to-amber-100 border border-emerald-300 text-emerald-950 px-4 py-2 rounded-2xl shadow-xl text-center text-xs font-bold animate-pulse">
+          🏆 Semua objek ditemukan! Suami punya surprise untukmu! 🎉
         </div>
       )}
 
-      <div className="w-full h-screen relative">
+      {/* Interactive Room Area */}
+      <div className="w-full h-screen relative bg-zinc-900">
         {!lampOn && (
-          <div className="absolute inset-0 bg-black bg-opacity-70 z-10 transition-all duration-500"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-95 z-10 transition-all duration-500 pointer-events-none"></div>
         )}
         
         <img 
@@ -1042,14 +1203,23 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
           alt="Birthday Room"
           className="w-full h-full object-cover select-none"
           draggable="false"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=600&auto=format&fit=crop';
+          }}
         />
 
-        <div className="absolute top-0 left-0 right-0 h-16 z-20" onClick={handleCeilingTap} />
+        {/* Ceiling Tap (Secret hotspot trigger) */}
+        <div className="absolute top-0 left-0 right-0 h-14 z-20 cursor-pointer" onClick={handleCeilingTap} title="Ketuk langit-langit 3 kali" />
 
+        {/* Render Hotspots */}
         {hotspots.map((spot) => (
           <div
             key={spot.id}
-            className="absolute cursor-pointer z-20"
+            className={`absolute cursor-pointer z-20 rounded-lg border-2 ${
+              clickedObjects.includes(spot.id) 
+                ? 'border-emerald-400/40 bg-emerald-400/10' 
+                : 'border-dashed border-amber-400/50 bg-amber-400/5 hover:border-amber-500'
+            } transition-all`}
             style={{
               left: spot.position.left,
               top: spot.position.top,
@@ -1057,21 +1227,60 @@ const SecretGiftModal: React.FC<ModalProps> = ({ onClose }) => {
               height: spot.position.height
             }}
             onClick={() => handleHotspotClick(spot.action, spot.id)}
+            title={spot.name}
           />
         ))}
       </div>
 
+      {/* Modals Routing */}
       {activeModal === 'cake' && <CakeModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'book' && <BookModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'gift' && <GiftModal onClose={() => setActiveModal(null)} />}
+      
+      {activeModal === 'gift1' && (
+        gift1Opened ? (
+          <AlreadyOpenedModal 
+            title="Jalan-jalan ke Bandung 🚗💨" 
+            desc="Kado 1 sudah dibuka! Petualangan seru menikmati sejuknya kota kembang bersama suamiku tercinta." 
+            onClose={() => setActiveModal(null)} 
+          />
+        ) : (
+          <Gift1Modal onClose={() => setActiveModal(null)} />
+        )
+      )}
+
+      {activeModal === 'gift2' && (
+        gift2Opened ? (
+          <AlreadyOpenedModal 
+            title="Staycation Hotel Jakarta 🏨✨" 
+            desc="Kado 2 sudah dibuka! Menikmati waktu santai, berenang, dan dimanja di hotel mewah Jakarta bersama suami." 
+            onClose={() => setActiveModal(null)} 
+          />
+        ) : (
+          <Gift2Modal onClose={() => setActiveModal(null)} />
+        )
+      )}
+
       {activeModal === 'balloon' && <BalloonModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'chair' && <ChairModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'cat' && <CatModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'cat1' && <Cat1Modal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'cat2' && <Cat2Modal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'cat3' && <Cat3Modal onClose={() => setActiveModal(null)} />}
       {activeModal === 'plant' && <PlantModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'table' && <TableModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'gallery' && <GalleryModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'easteregg' && <EasterEggModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'secret_gift' && <SecretGiftModal onClose={() => setActiveModal(null)} />}
+
+      {activeModal === 'secret_gift' && (
+        secretGiftOpened ? (
+          <AlreadyOpenedModal 
+            title="Laci Rahasia Terbuka! 💖" 
+            desc="Laci Rahasia sudah dibuka! Kamu telah mendapatkan Voucher Peluk & Cium Kening spesial dari suamimu." 
+            onClose={() => setActiveModal(null)} 
+          />
+        ) : (
+          <SecretGiftModal onClose={() => setActiveModal(null)} />
+        )
+      )}
     </div>
   );
 
